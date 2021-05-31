@@ -156,5 +156,13 @@ void dwa_demoFrame::Onfield_panelPaint(wxPaintEvent& event)
 
 void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
 {
-    world_map->create(wxPoint(0, 0));
+    if(world_map != nullptr)
+        delete world_map;
+    world_map = new Map;
+    world_map->create(map_panel->GetSize());
+    field_dc_client -> Clear();
+    for(int i = 0; i < world_map->obstacle_num; i++)
+    {
+        field_dc_client->DrawPolygon(4, world_map->obstacles[i].data());
+    }
 }

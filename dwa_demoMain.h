@@ -29,7 +29,7 @@ class dwa_demoFrame: public wxFrame
         dwa_demoFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~dwa_demoFrame();
 
-        Map* world_map;
+        Map* world_map = nullptr;
         //Robot robot;
 
     private:

@@ -3,13 +3,15 @@
 
 #include <vector>
 #include <wx/app.h>
+#include <random>
+#include <ctime>
 
 class Map
 {
 public:
     int obstacle_num;
-    std::vector<int> obstacles;
-    void create(wxPoint robot_position);
+    std::vector<std::vector<wxPoint>> obstacles;
+    void create(wxSize map_size);
 };
 
 #endif // MAP_H_INCLUDED
