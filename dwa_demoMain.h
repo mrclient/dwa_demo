@@ -18,6 +18,7 @@
 #include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/timer.h>
 //*)
 
 #include "Map.h"
@@ -32,6 +33,12 @@ class dwa_demoFrame: public wxFrame
 
         Map* world_map = nullptr;
         Robot robot;
+        void drawMap();
+        void drawRobot();
+        void drawGoal();
+        double angle_error(double px, double py, double ptheta);
+        double smallest_distance(double px, double py, double ptheta);
+        void stopProcedure();
 
     private:
 
@@ -48,20 +55,25 @@ class dwa_demoFrame: public wxFrame
         void OnTextCtrl7Text(wxCommandEvent& event);
         void Onfield_panelPaint(wxPaintEvent& event);
         void OnNewMapButtonClick(wxCommandEvent& event);
+        void mainTimerTickEvt(wxTimerEvent& event);
+        void OnStartButtonClick(wxCommandEvent& event);
+        void controllerTimerTickEvent(wxTimerEvent& event);
+        void onGoalXTextEnter(wxCommandEvent& event);
+        void onGoalYTextEnter(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(dwa_demoFrame)
         static const long ID_START_BUTTON;
         static const long ID_NEW_MAP_BUTTON;
         static const long ID_SBS_CHECKBOX;
-        static const long ID_TEXTCTRL1;
-        static const long ID_TEXTCTRL2;
-        static const long ID_TEXTCTRL3;
-        static const long ID_TEXTCTRL4;
+        static const long ID_ROBOTX_TEXTCTRL;
+        static const long ID_ROBOTY_TEXTCTRL;
+        static const long ID_ROBOTTH_TEXTCTRL;
+        static const long ID_GOALX_TEXTCTRL;
         static const long ID_STATICTEXT1;
         static const long ID_STATICTEXT2;
-        static const long ID_TEXTCTRL5;
-        static const long ID_TEXTCTRL6;
+        static const long ID_GOALY_TEXTCTRL;
+        static const long ID_CF_TXTCTRL;
         static const long ID_STATICTEXT3;
         static const long ID_STATICTEXT4;
         static const long ID_STATICTEXT5;
@@ -76,6 +88,8 @@ class dwa_demoFrame: public wxFrame
         static const long ID_MAP_PANEL;
         static const long ID_DWA_DC_CLIENT;
         static const long ID_DWA_PANEL;
+        static const long ID_WORLD_TIMER;
+        static const long ID_CONTROLLER_TIMER;
         //*)
 
         //(*Declarations(dwa_demoFrame)
@@ -95,15 +109,17 @@ class dwa_demoFrame: public wxFrame
         wxStaticText* StaticText6;
         wxStaticText* StaticText7;
         wxStaticText* StaticText8;
-        wxTextCtrl* TextCtrl1;
-        wxTextCtrl* TextCtrl2;
-        wxTextCtrl* TextCtrl3;
-        wxTextCtrl* TextCtrl4;
-        wxTextCtrl* TextCtrl5;
-        wxTextCtrl* TextCtrl6;
         wxTextCtrl* TextCtrl7;
         wxTextCtrl* TextCtrl8;
         wxTextCtrl* TextCtrl9;
+        wxTextCtrl* contr_freq_txt_ctrl;
+        wxTextCtrl* goal_x_txt_ctrl;
+        wxTextCtrl* goal_y_txt_ctrl;
+        wxTextCtrl* robot_th_txt_ctrl;
+        wxTextCtrl* robot_x_txt_ctrl;
+        wxTextCtrl* robot_y_txt_ctrl;
+        wxTimer controller_timer;
+        wxTimer world_timer;
         //*)
 
         DECLARE_EVENT_TABLE()

@@ -16,6 +16,7 @@
 				<label>Start</label>
 				<pos>10,425</pos>
 				<size>80,30</size>
+				<handler function="OnStartButtonClick" entry="EVT_BUTTON" />
 			</object>
 			<object class="wxButton" name="ID_NEW_MAP_BUTTON" variable="new_map_button" member="yes">
 				<label>New map</label>
@@ -28,25 +29,27 @@
 				<label>&quot;Step by step&quot; mode</label>
 				<pos>8,390</pos>
 			</object>
-			<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
+			<object class="wxTextCtrl" name="ID_ROBOTX_TEXTCTRL" variable="robot_x_txt_ctrl" member="yes">
 				<value>1.0</value>
 				<pos>5,35</pos>
 				<size>60,30</size>
 			</object>
-			<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl2" member="yes">
+			<object class="wxTextCtrl" name="ID_ROBOTY_TEXTCTRL" variable="robot_y_txt_ctrl" member="yes">
 				<value>1.0</value>
 				<pos>70,35</pos>
 				<size>60,30</size>
 			</object>
-			<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="TextCtrl3" member="yes">
+			<object class="wxTextCtrl" name="ID_ROBOTTH_TEXTCTRL" variable="robot_th_txt_ctrl" member="yes">
 				<value>0.0</value>
 				<pos>135,35</pos>
 				<size>60,30</size>
 			</object>
-			<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="TextCtrl4" member="yes">
+			<object class="wxTextCtrl" name="ID_GOALX_TEXTCTRL" variable="goal_x_txt_ctrl" member="yes">
 				<value>5.0</value>
 				<pos>5,110</pos>
 				<size>60,30</size>
+				<style>wxTE_PROCESS_ENTER</style>
+				<handler function="onGoalXTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
 			<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 				<label>Robot pose (x,y,theta):</label>
@@ -56,12 +59,14 @@
 				<label>Goal position (x,y):</label>
 				<pos>8,80</pos>
 			</object>
-			<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="TextCtrl5" member="yes">
+			<object class="wxTextCtrl" name="ID_GOALY_TEXTCTRL" variable="goal_y_txt_ctrl" member="yes">
 				<value>5.0</value>
 				<pos>80,110</pos>
 				<size>60,30</size>
+				<style>wxTE_PROCESS_ENTER</style>
+				<handler function="onGoalYTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
-			<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="TextCtrl6" member="yes">
+			<object class="wxTextCtrl" name="ID_CF_TXTCTRL" variable="contr_freq_txt_ctrl" member="yes">
 				<value>0.5</value>
 				<pos>5,350</pos>
 				<size>50,30</size>
@@ -132,6 +137,14 @@
 				<pos>16,16</pos>
 				<size>47,47</size>
 			</object>
+		</object>
+		<object class="wxTimer" name="ID_WORLD_TIMER" variable="world_timer" member="yes">
+			<interval>10</interval>
+			<handler function="mainTimerTickEvt" entry="EVT_TIMER" />
+		</object>
+		<object class="wxTimer" name="ID_CONTROLLER_TIMER" variable="controller_timer" member="yes">
+			<interval>2000</interval>
+			<handler function="controllerTimerTickEvent" entry="EVT_TIMER" />
 		</object>
 	</object>
 </wxsmith>
