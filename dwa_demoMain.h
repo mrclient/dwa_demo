@@ -21,6 +21,7 @@
 //*)
 
 #include "Map.h"
+#include "Robot.h"
 
 class dwa_demoFrame: public wxFrame
 {
@@ -30,7 +31,7 @@ class dwa_demoFrame: public wxFrame
         virtual ~dwa_demoFrame();
 
         Map* world_map = nullptr;
-        //Robot robot;
+        Robot robot;
 
     private:
 

@@ -152,6 +152,7 @@ void dwa_demoFrame::OnTextCtrl7Text(wxCommandEvent& event)
 
 void dwa_demoFrame::Onfield_panelPaint(wxPaintEvent& event)
 {
+
 }
 
 void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
@@ -165,4 +166,5 @@ void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
     {
         field_dc_client->DrawPolygon(4, world_map->obstacles[i].data());
     }
+    field_dc_client->DrawPolygon(4, robot.global_footprint.data());
 }

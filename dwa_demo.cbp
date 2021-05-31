@@ -70,6 +70,8 @@
 		</Linker>
 		<Unit filename="Map.cpp" />
 		<Unit filename="Map.h" />
+		<Unit filename="Robot.cpp" />
+		<Unit filename="Robot.h" />
 		<Unit filename="dwa_demoApp.cpp" />
 		<Unit filename="dwa_demoApp.h" />
 		<Unit filename="dwa_demoMain.cpp" />
