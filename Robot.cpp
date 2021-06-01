@@ -43,12 +43,12 @@ Robot::Robot(){
 
     global_footprint.resize(4);
     updateGlobalFootprint();
-    wh1_controller.T = 1.0;
-    wh2_controller.T = 1.0;
+    wh1_controller.T = 0.1;
+    wh2_controller.T = 0.1;
 }
 
 
-void Robot::transformPoint(const wxPoint& from, wxPoint& to)
+void Robot::transformPoint(double x, double y, double theta, const wxPoint& from, wxPoint& to)
 {
     to.x = x + std::round(from.x * std::cos(theta) - from.y * std::sin(theta));
     to.y = y + std::round(from.x * std::sin(theta) + from.y * std::cos(theta));
@@ -57,7 +57,7 @@ void Robot::transformPoint(const wxPoint& from, wxPoint& to)
 void Robot::updateGlobalFootprint()
 {
     for(int i = 0; i < 4; i++)
-        transformPoint(local_footprint[i], global_footprint[i]);
+        transformPoint(x, y, theta, local_footprint[i], global_footprint[i]);
 }
 
 void Robot::stop()
@@ -92,11 +92,29 @@ void Robot::updateState(double dt)
 
 
 void Robot::predictState(double new_wh_sp_1, double new_wh_sp_2, double dt,
-                         double& px, double& py, double& ptheta, double& pv)
+                         double& px, double& py, double& ptheta, double& pv, double& pomega)
 {
-    pv = 0.25 * (wheel_speed_1 + wheel_speed_2 + new_wh_sp_1 + new_wh_sp_2) * wheel_radius;
-    double pomega = 0.5 * (wheel_speed_1 + new_wh_sp_1 - wheel_speed_2 - new_wh_sp_2) * wheel_radius / robot_wheel_width;
-    px = x + pv * std::cos(theta) * dt;
-    py = y + pv * std::sin(theta) * dt;
+    pv = 0.5 * (new_wh_sp_1 + new_wh_sp_2) * wheel_radius;
+    pomega = (new_wh_sp_1 - new_wh_sp_2) * wheel_radius / robot_wheel_width;
+// commented code also works well
+//    px = x;
+//    py = y;
+//    ptheta = theta;
+//    for(double t = 0.01; t < dt; t+=0.01)
+//    {
+//        px = px + pv * std::cos(ptheta) * 0.01;
+//        py = py + pv * std::sin(ptheta) * 0.01;
+//        ptheta = ptheta + pomega * 0.01;
+//    }
+    if(pomega <= 0.01 && pomega >= -0.01)
+    {
+        px = x + pv * std::cos(theta) * dt;
+        py = y + pv * std::sin(theta) * dt;
+    }
+    else
+    {
+        px = x - pv / pomega * (std::sin(theta) - std::sin(pomega * dt + theta));
+        py = y + pv / pomega * (std::cos(theta) - std::cos(pomega * dt + theta));
+    }
     ptheta = theta + pomega * dt;
 }

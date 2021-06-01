@@ -38,8 +38,8 @@ public:
     void stop();
     void updateState(double dt);
     void predictState(double new_wh_sp_1, double new_wh_sp_2, double dt,
-                      double& px, double& py, double& ptheta, double& pv);
-    void transformPoint(const wxPoint& from, wxPoint& to);
+                      double& px, double& py, double& ptheta, double& pv, double& pomega);
+    void transformPoint(double x, double y, double theta, const wxPoint& from, wxPoint& to);
     void updateGlobalFootprint();
 };
 

@@ -139,11 +139,11 @@
 			</object>
 		</object>
 		<object class="wxTimer" name="ID_WORLD_TIMER" variable="world_timer" member="yes">
-			<interval>10</interval>
+			<interval>25</interval>
 			<handler function="mainTimerTickEvt" entry="EVT_TIMER" />
 		</object>
 		<object class="wxTimer" name="ID_CONTROLLER_TIMER" variable="controller_timer" member="yes">
-			<interval>2000</interval>
+			<interval>500</interval>
 			<handler function="controllerTimerTickEvent" entry="EVT_TIMER" />
 		</object>
 	</object>

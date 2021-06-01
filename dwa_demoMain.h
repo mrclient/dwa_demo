@@ -37,8 +37,10 @@ class dwa_demoFrame: public wxFrame
         void drawRobot();
         void drawGoal();
         double angle_error(double px, double py, double ptheta);
-        double smallest_distance(double px, double py, double ptheta);
+        double max_free_distance(double new_wh_sp_1, double new_wh_sp_2);
         void stopProcedure();
+        bool collision_check(bool safe, double px, double py, double ptheta);
+        int leftTurn(const wxPoint& a, const wxPoint& b, const wxPoint& c);
 
     private:
 

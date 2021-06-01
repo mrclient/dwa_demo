@@ -115,9 +115,9 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     dwa_panel = new wxPanel(this, ID_DWA_PANEL, wxPoint(740,480), wxSize(210,210), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_DWA_PANEL"));
     dwa_dc_client = new wxClientDC(dwa_panel);
     world_timer.SetOwner(this, ID_WORLD_TIMER);
-    world_timer.Start(10, false);
+    world_timer.Start(25, false);
     controller_timer.SetOwner(this, ID_CONTROLLER_TIMER);
-    controller_timer.Start(2000, false);
+    controller_timer.Start(500, false);
     Center();
 
     Connect(ID_START_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnStartButtonClick);
@@ -141,10 +141,19 @@ dwa_demoFrame::~dwa_demoFrame()
 
 void dwa_demoFrame::drawMap()
 {
+    wxPen orig_pen = field_dc_client->GetPen();
+    field_dc_client->SetPen(wxPen(wxColour(0, 255, 0)));
+    for(int i = 0; i < world_map->obstacle_num; i++)
+    {
+        field_dc_client->DrawPolygon(4, world_map->bigger_obstacles[i].data());
+    }
+
+    field_dc_client->SetPen(orig_pen);
     for(int i = 0; i < world_map->obstacle_num; i++)
     {
         field_dc_client->DrawPolygon(4, world_map->obstacles[i].data());
     }
+
 }
 
 
@@ -256,6 +265,11 @@ void dwa_demoFrame::mainTimerTickEvt(wxTimerEvent& event)
         robot_y_txt_ctrl->SetValue(std::to_string(robot.y / 100.0));
         robot_th_txt_ctrl->SetValue(std::to_string(robot.theta));
         robot.updateState(world_timer.GetInterval()/1000.0);
+        if(collision_check(false, robot.x, robot.y, robot.theta))
+        {
+            stopProcedure();
+            wxMessageBox("Collision detected");
+        }
         drawRobot();
     }
 }
@@ -275,22 +289,85 @@ double dwa_demoFrame::angle_error(double px, double py, double ptheta)
     double delta = (std::atan2(gy*100.0 - py, gx*100.0 - px) - ptheta);
     if(delta > M_PI) delta = -(2*M_PI - delta);
     if(delta < -M_PI) delta = 2*M_PI + delta;
-    return std::abs(delta);
+    return delta;
 }
 
 
-double dwa_demoFrame::smallest_distance(double px, double py, double ptheta)
+double dwa_demoFrame::max_free_distance(double new_wh_sp_1, double new_wh_sp_2)
 {
-    return 0.0;
+    double px, py, ptheta, pvel, pomega;
+    double dt = controller_timer.GetInterval()/1000.0;
+    double safe_distance = 1000.0;
+
+    if(world_map==nullptr)
+        return 1000.0;
+
+    int i;
+    for(i = 5; i >= 1; i--)
+    {
+        robot.predictState(new_wh_sp_1, new_wh_sp_2, i*dt, px, py, ptheta, pvel, pomega);
+        if(collision_check(true, px, py, ptheta))
+        {
+            safe_distance = 0.0;
+            continue;
+        }
+        else
+        {
+            if(pomega == 0.0)
+                safe_distance = std::sqrt(std::pow(robot.x - px, 2) + std::pow(robot.y - py, 2));
+            else
+                safe_distance = pvel / pomega * (ptheta - robot.theta);
+            break;
+        }
+    }
+
+    return (i == 5) ? 1000.0 : std::abs(safe_distance);
+}
+
+
+int dwa_demoFrame::leftTurn(const wxPoint& a, const wxPoint& b, const wxPoint& c)
+{
+    int v = (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+    return (v > 0) ? 1 : (v < 0 ? -1 : 0);
+}
+
+
+// should be improved
+bool dwa_demoFrame::collision_check(bool safe, double px, double py, double ptheta)
+{
+    wxPoint robot_pt1, robot_pt2;
+    if(world_map==nullptr)
+        return false;
+
+    std::vector<std::vector<wxPoint>>& obstacles = safe ? world_map->bigger_obstacles : world_map->obstacles;
+    for(int j = 0; j < obstacles.size(); j++)
+    {
+        int sz = obstacles[j].size();
+        for(int k = 0; k < sz; k++)
+        {
+            wxPoint obst_pt1 = obstacles[j][k];
+            wxPoint obst_pt2 = obstacles[j][(k + 1) % sz];
+            for(int i = 0; i < 4; i++)
+            {
+                robot.transformPoint(px, py, ptheta, robot.local_footprint[i], robot_pt1);
+                robot.transformPoint(px, py, ptheta, robot.local_footprint[(i+1)%4], robot_pt2);
+                bool is_in_collision = (leftTurn(robot_pt1, robot_pt2, obst_pt1) != leftTurn(robot_pt1, robot_pt2, obst_pt2))
+                                        && ((leftTurn(obst_pt1, obst_pt2, robot_pt1) != leftTurn(obst_pt1, obst_pt2, robot_pt2)));
+                if(is_in_collision)
+                    return true;
+            }
+        }
+    }
+    return false;
 }
 
 
 void dwa_demoFrame::controllerTimerTickEvent(wxTimerEvent& event)
 {
     double best_wh1 = 0.0, best_wh2 = 0.0;
-    double cost, best_cost = 10e6;
+    double cost, best_cost = 0.0;
 
-    double px, py, ptheta, pvel;
+    double px, py, ptheta, pvel, pomega;
     double gx, gy;
 
     if(!program_stopped)
@@ -304,14 +381,15 @@ void dwa_demoFrame::controllerTimerTickEvent(wxTimerEvent& event)
             return;
         }
 
-        double wh1, wh2;
-        for(wh1 = -2.0; wh1 <= 2.0; wh1 += 0.4)
+        for(double wh1 = -4.0; wh1 <= 4.0; wh1 += 0.8)
         {
-            for(wh2 = -2.0; wh2 <= 2.0; wh2 += 0.4)
+            for(double wh2 = -4.0; wh2 <= 4.0; wh2 += 0.8)
             {
-                robot.predictState(wh1, wh2, controller_timer.GetInterval()/1000.0, px, py, ptheta, pvel);
-                cost = 2000000.0 * angle_error(px, py, ptheta) + 100.0 * smallest_distance(px, py, ptheta) - 10000.0 * pvel;
-                if(cost < best_cost)
+                robot.predictState(wh1, wh2, controller_timer.GetInterval()/1000.0, px, py, ptheta, pvel, pomega);
+                if(collision_check(true, px, py, ptheta))
+                    continue;
+                cost = 0.1 * std::cos(angle_error(px, py, ptheta)) +  0.02 * max_free_distance(wh1, wh2) + 0.002 * pvel*std::cos(angle_error(px, py, ptheta));
+                if(cost > best_cost)
                 {
                     best_cost = cost;
                     best_wh1 = wh1;
@@ -319,10 +397,12 @@ void dwa_demoFrame::controllerTimerTickEvent(wxTimerEvent& event)
                 }
             }
         }
+        robot.predictState(best_wh1, best_wh2, 5*controller_timer.GetInterval()/1000.0, px, py, ptheta, pvel, pomega);
+        field_dc_client->DrawCircle(px, py, 10);
         robot.wh1_controller.setDesiredValue(best_wh1);
         robot.wh2_controller.setDesiredValue(best_wh2);
-        return;
     }
+    return;
 }
 
 

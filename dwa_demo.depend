@@ -1503,7 +1503,7 @@
 1618266238 c:\dev_progs\wxwidgets\include\wx\univ\theme.h
 	"wx/string.h"
 
-1622485425 c:\users\anton\desktop\dwa_demo\dwa_demomain.h
+1622555877 c:\users\anton\desktop\dwa_demo\dwa_demomain.h
 	<wx/button.h>
 	<wx/checkbox.h>
 	<wx/dcclient.h>
@@ -1603,7 +1603,7 @@
 
 1618266238 c:\dev_progs\wxwidgets\include\wx\msw\rcdefs.h
 
-1622489417 source:c:\users\anton\desktop\dwa_demo\dwa_demomain.cpp
+1622555284 source:c:\users\anton\desktop\dwa_demo\dwa_demomain.cpp
 	"dwa_demoMain.h"
 	<wx/msgdlg.h>
 	<wx/intl.h>
@@ -1880,19 +1880,19 @@
 
 1618266238 c:\dev_progs\wxwidgets\include\wx\qt\textctrl.h
 
-1622452368 c:\users\anton\desktop\dwa_demo\map.h
+1622534735 c:\users\anton\desktop\dwa_demo\map.h
 	<vector>
 	<wx/app.h>
 	<random>
 	<ctime>
 
-1622452718 source:c:\users\anton\desktop\dwa_demo\map.cpp
+1622554984 source:c:\users\anton\desktop\dwa_demo\map.cpp
 	"Map.h"
 
-1622488421 source:c:\users\anton\desktop\dwa_demo\robot.cpp
+1622554742 source:c:\users\anton\desktop\dwa_demo\robot.cpp
 	"Robot.h"
 
-1622480457 c:\users\anton\desktop\dwa_demo\robot.h
+1622545314 c:\users\anton\desktop\dwa_demo\robot.h
 	<wx/app.h>
 	<wx/msgdlg.h>
 

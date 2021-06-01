@@ -11,6 +11,7 @@ class Map
 public:
     int obstacle_num;
     std::vector<std::vector<wxPoint>> obstacles;
+    std::vector<std::vector<wxPoint>> bigger_obstacles;
     void create(wxSize map_size);
 };
 
