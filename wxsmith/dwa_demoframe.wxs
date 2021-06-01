@@ -48,8 +48,9 @@
 				<value>5.0</value>
 				<pos>5,110</pos>
 				<size>60,30</size>
+				<tooltip>Press Enter after input</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
-				<handler function="onGoalXTextEnter" entry="EVT_TEXT_ENTER" />
+				<handler function="onGoalTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
 			<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 				<label>Robot pose (x,y,theta):</label>
@@ -63,8 +64,9 @@
 				<value>5.0</value>
 				<pos>80,110</pos>
 				<size>60,30</size>
+				<tooltip>Press Enter after input</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
-				<handler function="onGoalYTextEnter" entry="EVT_TEXT_ENTER" />
+				<handler function="onGoalTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
 			<object class="wxTextCtrl" name="ID_CF_TXTCTRL" variable="contr_freq_txt_ctrl" member="yes">
 				<value>0.5</value>

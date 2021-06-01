@@ -6,6 +6,13 @@
 #include <random>
 #include <ctime>
 
+class Goal
+{
+public:
+    double x;
+    double y;
+};
+
 class Map
 {
 public:

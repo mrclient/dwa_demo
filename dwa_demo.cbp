@@ -68,6 +68,8 @@
 		<Linker>
 			<Add option="-mthreads" />
 		</Linker>
+		<Unit filename="DWAplanner.cpp" />
+		<Unit filename="DWAplanner.h" />
 		<Unit filename="Map.cpp" />
 		<Unit filename="Map.h" />
 		<Unit filename="Robot.cpp" />

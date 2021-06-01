@@ -23,45 +23,41 @@
 
 #include "Map.h"
 #include "Robot.h"
+#include "DWAplanner.h"
+#include <wx/msgdlg.h>
 
 class dwa_demoFrame: public wxFrame
 {
     public:
 
-        dwa_demoFrame(wxWindow* parent,wxWindowID id = -1);
+        dwa_demoFrame(wxWindow* parent, wxWindowID id = -1);
         virtual ~dwa_demoFrame();
 
-        Map* world_map = nullptr;
+        Map* world_map;
         Robot robot;
+        Goal goal;
+        DWAplanner dwa_planner;
+        bool program_stopped;
+
         void drawMap();
         void drawRobot();
         void drawGoal();
-        double angle_error(double px, double py, double ptheta);
-        double max_free_distance(double new_wh_sp_1, double new_wh_sp_2);
         void stopProcedure();
-        bool collision_check(bool safe, double px, double py, double ptheta);
-        int leftTurn(const wxPoint& a, const wxPoint& b, const wxPoint& c);
+
 
     private:
 
         //(*Handlers(dwa_demoFrame)
-        void OnQuit(wxCommandEvent& event);
-        void OnAbout(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnPanel1Paint(wxPaintEvent& event);
         void Onnew_plan_buttonClick(wxCommandEvent& event);
-        void OnTextCtrl1Text(wxCommandEvent& event);
-        void OnTextCtrl5Text(wxCommandEvent& event);
         void Onnew_map_buttonClick(wxCommandEvent& event);
-        void OnTextCtrl6Text(wxCommandEvent& event);
-        void OnTextCtrl7Text(wxCommandEvent& event);
         void Onfield_panelPaint(wxPaintEvent& event);
         void OnNewMapButtonClick(wxCommandEvent& event);
         void mainTimerTickEvt(wxTimerEvent& event);
         void OnStartButtonClick(wxCommandEvent& event);
         void controllerTimerTickEvent(wxTimerEvent& event);
-        void onGoalXTextEnter(wxCommandEvent& event);
-        void onGoalYTextEnter(wxCommandEvent& event);
+        void onGoalTextEnter(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(dwa_demoFrame)

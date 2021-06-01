@@ -8,7 +8,6 @@
  **************************************************************/
 
 #include "dwa_demoMain.h"
-#include <wx/msgdlg.h>
 
 //(*InternalHeaders(dwa_demoFrame)
 #include <wx/intl.h>
@@ -16,8 +15,6 @@
 #include <wx/string.h>
 //*)
 
-
-bool program_stopped = true;
 
 //helper functions
 enum wxbuildinfoformat {
@@ -96,9 +93,11 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     robot_y_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTY_TEXTCTRL, _("1.0"), wxPoint(70,35), wxSize(60,30), 0, wxDefaultValidator, _T("ID_ROBOTY_TEXTCTRL"));
     robot_th_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTTH_TEXTCTRL, _("0.0"), wxPoint(135,35), wxSize(60,30), 0, wxDefaultValidator, _T("ID_ROBOTTH_TEXTCTRL"));
     goal_x_txt_ctrl = new wxTextCtrl(control_panel, ID_GOALX_TEXTCTRL, _("5.0"), wxPoint(5,110), wxSize(60,30), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_GOALX_TEXTCTRL"));
+    goal_x_txt_ctrl->SetToolTip(_("Press Enter after input"));
     StaticText1 = new wxStaticText(control_panel, ID_STATICTEXT1, _("Robot pose (x,y,theta):"), wxPoint(5,5), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     StaticText2 = new wxStaticText(control_panel, ID_STATICTEXT2, _("Goal position (x,y):"), wxPoint(8,80), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     goal_y_txt_ctrl = new wxTextCtrl(control_panel, ID_GOALY_TEXTCTRL, _("5.0"), wxPoint(80,110), wxSize(60,30), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_GOALY_TEXTCTRL"));
+    goal_y_txt_ctrl->SetToolTip(_("Press Enter after input"));
     contr_freq_txt_ctrl = new wxTextCtrl(control_panel, ID_CF_TXTCTRL, _("0.5"), wxPoint(5,350), wxSize(50,30), 0, wxDefaultValidator, _T("ID_CF_TXTCTRL"));
     StaticText3 = new wxStaticText(control_panel, ID_STATICTEXT3, _("Controller\nfrequency (Hz):"), wxPoint(5,300), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     StaticText4 = new wxStaticText(control_panel, ID_STATICTEXT4, _("World\ntime (s):"), wxPoint(135,300), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -122,15 +121,18 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_START_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnStartButtonClick);
     Connect(ID_NEW_MAP_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnNewMapButtonClick);
-    Connect(ID_GOALX_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onGoalXTextEnter);
-    Connect(ID_GOALY_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onGoalYTextEnter);
-    Connect(ID_CF_TXTCTRL,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&dwa_demoFrame::OnTextCtrl6Text);
-    Connect(ID_TEXTCTRL7,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&dwa_demoFrame::OnTextCtrl7Text);
+    Connect(ID_GOALX_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onGoalTextEnter);
+    Connect(ID_GOALY_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onGoalTextEnter);
     map_panel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&dwa_demoFrame::Onfield_panelPaint,0,this);
     Connect(ID_WORLD_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::mainTimerTickEvt);
     Connect(ID_CONTROLLER_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::controllerTimerTickEvent);
     Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&dwa_demoFrame::OnClose);
     //*)
+
+    world_map = nullptr;
+    program_stopped = true;
+    dwa_planner.robot = &robot;
+    dwa_planner.goal = &goal;
 }
 
 dwa_demoFrame::~dwa_demoFrame()
@@ -182,10 +184,8 @@ void dwa_demoFrame::drawGoal()
         field_dc_client->SetPen(wxPen(wxColour(255, 255, 255)));
         field_dc_client->DrawCircle(last_x, last_y, 11);
     }
-    goal_x_txt_ctrl->GetValue().ToDouble(&x);
-    goal_y_txt_ctrl->GetValue().ToDouble(&y);
-    last_x = std::round(x*100.0);
-    last_y = std::round(y*100.0);
+    last_x = goal.x;
+    last_y = goal.y;
     field_dc_client->SetPen(wxPen(wxColour(255, 0, 0)));
     field_dc_client->DrawCircle(last_x, last_y, 10);
     field_dc_client->SetPen(orig_pen);
@@ -196,10 +196,7 @@ void dwa_demoFrame::stopProcedure()
 {
     if(program_stopped)
     {
-//        robot.wh1_controller.setDesiredValue(0.0);
-//        robot.wh2_controller.setDesiredValue(0.0);
         start_button->SetLabel("Stop");
-
     }
     else
     {
@@ -208,19 +205,11 @@ void dwa_demoFrame::stopProcedure()
     }
     program_stopped = !program_stopped;
     new_map_button->Enable(program_stopped);
+    robot_x_txt_ctrl->Enable(program_stopped);
+    robot_y_txt_ctrl->Enable(program_stopped);
+    robot_th_txt_ctrl->Enable(program_stopped);
 }
 
-
-void dwa_demoFrame::OnQuit(wxCommandEvent& event)
-{
-    Close();
-}
-
-void dwa_demoFrame::OnAbout(wxCommandEvent& event)
-{
-    wxString msg = wxbuildinfo(long_f);
-    wxMessageBox(msg, _("Welcome to..."));
-}
 
 void dwa_demoFrame::OnClose(wxCloseEvent& event)
 {
@@ -228,19 +217,14 @@ void dwa_demoFrame::OnClose(wxCloseEvent& event)
 }
 
 
-void dwa_demoFrame::OnTextCtrl6Text(wxCommandEvent& event)
-{
-}
-
-void dwa_demoFrame::OnTextCtrl7Text(wxCommandEvent& event)
-{
-}
-
 void dwa_demoFrame::Onfield_panelPaint(wxPaintEvent& event)
 {
     drawRobot();
     drawGoal();
+    if(world_map != nullptr)
+        drawMap();
 }
+
 
 void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
 {
@@ -248,6 +232,7 @@ void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
         delete world_map;
     world_map = new Map;
     world_map->create(map_panel->GetSize());
+    dwa_planner.world_map = world_map;
 
     field_dc_client -> Clear();
     drawMap();
@@ -265,7 +250,7 @@ void dwa_demoFrame::mainTimerTickEvt(wxTimerEvent& event)
         robot_y_txt_ctrl->SetValue(std::to_string(robot.y / 100.0));
         robot_th_txt_ctrl->SetValue(std::to_string(robot.theta));
         robot.updateState(world_timer.GetInterval()/1000.0);
-        if(collision_check(false, robot.x, robot.y, robot.theta))
+        if(dwa_planner.collision_check(false, robot.x, robot.y, robot.theta))
         {
             stopProcedure();
             wxMessageBox("Collision detected");
@@ -281,140 +266,23 @@ void dwa_demoFrame::OnStartButtonClick(wxCommandEvent& event)
 }
 
 
-double dwa_demoFrame::angle_error(double px, double py, double ptheta)
-{
-    double gx, gy;
-    goal_x_txt_ctrl->GetValue().ToDouble(&gx);
-    goal_y_txt_ctrl->GetValue().ToDouble(&gy);
-    double delta = (std::atan2(gy*100.0 - py, gx*100.0 - px) - ptheta);
-    if(delta > M_PI) delta = -(2*M_PI - delta);
-    if(delta < -M_PI) delta = 2*M_PI + delta;
-    return delta;
-}
-
-
-double dwa_demoFrame::max_free_distance(double new_wh_sp_1, double new_wh_sp_2)
-{
-    double px, py, ptheta, pvel, pomega;
-    double dt = controller_timer.GetInterval()/1000.0;
-    double safe_distance = 1000.0;
-
-    if(world_map==nullptr)
-        return 1000.0;
-
-    int i;
-    for(i = 5; i >= 1; i--)
-    {
-        robot.predictState(new_wh_sp_1, new_wh_sp_2, i*dt, px, py, ptheta, pvel, pomega);
-        if(collision_check(true, px, py, ptheta))
-        {
-            safe_distance = 0.0;
-            continue;
-        }
-        else
-        {
-            if(pomega == 0.0)
-                safe_distance = std::sqrt(std::pow(robot.x - px, 2) + std::pow(robot.y - py, 2));
-            else
-                safe_distance = pvel / pomega * (ptheta - robot.theta);
-            break;
-        }
-    }
-
-    return (i == 5) ? 1000.0 : std::abs(safe_distance);
-}
-
-
-int dwa_demoFrame::leftTurn(const wxPoint& a, const wxPoint& b, const wxPoint& c)
-{
-    int v = (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
-    return (v > 0) ? 1 : (v < 0 ? -1 : 0);
-}
-
-
-// should be improved
-bool dwa_demoFrame::collision_check(bool safe, double px, double py, double ptheta)
-{
-    wxPoint robot_pt1, robot_pt2;
-    if(world_map==nullptr)
-        return false;
-
-    std::vector<std::vector<wxPoint>>& obstacles = safe ? world_map->bigger_obstacles : world_map->obstacles;
-    for(int j = 0; j < obstacles.size(); j++)
-    {
-        int sz = obstacles[j].size();
-        for(int k = 0; k < sz; k++)
-        {
-            wxPoint obst_pt1 = obstacles[j][k];
-            wxPoint obst_pt2 = obstacles[j][(k + 1) % sz];
-            for(int i = 0; i < 4; i++)
-            {
-                robot.transformPoint(px, py, ptheta, robot.local_footprint[i], robot_pt1);
-                robot.transformPoint(px, py, ptheta, robot.local_footprint[(i+1)%4], robot_pt2);
-                bool is_in_collision = (leftTurn(robot_pt1, robot_pt2, obst_pt1) != leftTurn(robot_pt1, robot_pt2, obst_pt2))
-                                        && ((leftTurn(obst_pt1, obst_pt2, robot_pt1) != leftTurn(obst_pt1, obst_pt2, robot_pt2)));
-                if(is_in_collision)
-                    return true;
-            }
-        }
-    }
-    return false;
-}
-
-
 void dwa_demoFrame::controllerTimerTickEvent(wxTimerEvent& event)
 {
-    double best_wh1 = 0.0, best_wh2 = 0.0;
-    double cost, best_cost = 0.0;
-
-    double px, py, ptheta, pvel, pomega;
-    double gx, gy;
-
     if(!program_stopped)
-    {
-        goal_x_txt_ctrl->GetValue().ToDouble(&gx);
-        goal_y_txt_ctrl->GetValue().ToDouble(&gy);
-
-        if(std::pow(robot.x - gx*100.0, 2) + std::pow(robot.y - gy*100.0, 2) < 100.0)
-        {
+        if(dwa_planner.checkAchievment())
             stopProcedure();
-            return;
-        }
-
-        for(double wh1 = -4.0; wh1 <= 4.0; wh1 += 0.8)
-        {
-            for(double wh2 = -4.0; wh2 <= 4.0; wh2 += 0.8)
-            {
-                robot.predictState(wh1, wh2, controller_timer.GetInterval()/1000.0, px, py, ptheta, pvel, pomega);
-                if(collision_check(true, px, py, ptheta))
-                    continue;
-                cost = 0.1 * std::cos(angle_error(px, py, ptheta)) +  0.02 * max_free_distance(wh1, wh2) + 0.002 * pvel*std::cos(angle_error(px, py, ptheta));
-                if(cost > best_cost)
-                {
-                    best_cost = cost;
-                    best_wh1 = wh1;
-                    best_wh2 = wh2;
-                }
-            }
-        }
-        robot.predictState(best_wh1, best_wh2, 5*controller_timer.GetInterval()/1000.0, px, py, ptheta, pvel, pomega);
-        field_dc_client->DrawCircle(px, py, 10);
-        robot.wh1_controller.setDesiredValue(best_wh1);
-        robot.wh2_controller.setDesiredValue(best_wh2);
-    }
-    return;
+        else
+            dwa_planner.updateControl(controller_timer.GetInterval()/1000.0);
 }
 
 
-void dwa_demoFrame::onGoalXTextEnter(wxCommandEvent& event)
+void dwa_demoFrame::onGoalTextEnter(wxCommandEvent& event)
 {
-    drawGoal();
-    drawRobot();
-}
-
-
-void dwa_demoFrame::onGoalYTextEnter(wxCommandEvent& event)
-{
+    //Add beautiful formatting of fields text
+    goal_x_txt_ctrl->GetValue().ToDouble(&goal.x);
+    goal_y_txt_ctrl->GetValue().ToDouble(&goal.y);
+    goal.x = std::round(goal.x*100.0);
+    goal.y = std::round(goal.y*100.0);
     drawGoal();
     drawRobot();
 }
