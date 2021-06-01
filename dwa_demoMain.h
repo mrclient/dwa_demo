@@ -12,7 +12,6 @@
 
 //(*Headers(dwa_demoFrame)
 #include <wx/button.h>
-#include <wx/checkbox.h>
 #include <wx/dcclient.h>
 #include <wx/frame.h>
 #include <wx/panel.h>
@@ -43,27 +42,24 @@ class dwa_demoFrame: public wxFrame
         void drawRobot();
         void drawGoal();
         void stopProcedure();
+        void readTextFields();
 
 
     private:
 
         //(*Handlers(dwa_demoFrame)
         void OnClose(wxCloseEvent& event);
-        void OnPanel1Paint(wxPaintEvent& event);
-        void Onnew_plan_buttonClick(wxCommandEvent& event);
-        void Onnew_map_buttonClick(wxCommandEvent& event);
         void Onfield_panelPaint(wxPaintEvent& event);
         void OnNewMapButtonClick(wxCommandEvent& event);
         void mainTimerTickEvt(wxTimerEvent& event);
         void OnStartButtonClick(wxCommandEvent& event);
         void controllerTimerTickEvent(wxTimerEvent& event);
-        void onGoalTextEnter(wxCommandEvent& event);
+        void onTextEnter(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(dwa_demoFrame)
         static const long ID_START_BUTTON;
         static const long ID_NEW_MAP_BUTTON;
-        static const long ID_SBS_CHECKBOX;
         static const long ID_ROBOTX_TEXTCTRL;
         static const long ID_ROBOTY_TEXTCTRL;
         static const long ID_ROBOTTH_TEXTCTRL;
@@ -71,15 +67,29 @@ class dwa_demoFrame: public wxFrame
         static const long ID_STATICTEXT1;
         static const long ID_STATICTEXT2;
         static const long ID_GOALY_TEXTCTRL;
-        static const long ID_CF_TXTCTRL;
         static const long ID_STATICTEXT3;
+        static const long ID_STATICTEXT6;
+        static const long ID_CYCLE_TEXTCTRL;
+        static const long ID_PRED_TEXTCTRL;
+        static const long ID_STATICTEXT7;
+        static const long ID_TRAJQNT_TEXTCTRL;
+        static const long ID_STATICTEXT9;
+        static const long ID_ROBOTL_TEXTCTRL;
+        static const long ID_ROBOTW_TEXTCTRL;
+        static const long ID_ROBOTR_TEXTCTRL;
+        static const long ID_STATICTEXT10;
+        static const long ID_MAXSPEED_TEXTCTRL;
+        static const long ID_MAXACC_TEXTCTRL;
+        static const long ID_PID_TEXTCTRL;
+        static const long ID_TEXTCTRL10;
+        static const long ID_DWA_KD_TEXTCTRL;
+        static const long ID_DWA_KS_TEXTCTRL;
+        static const long ID_ACCUR_TEXTCTRL;
+        static const long ID_BORD_TEXTCTRL;
         static const long ID_STATICTEXT4;
         static const long ID_STATICTEXT5;
-        static const long ID_STATICTEXT6;
-        static const long ID_TEXTCTRL7;
-        static const long ID_TEXTCTRL8;
-        static const long ID_STATICTEXT7;
-        static const long ID_TEXTCTRL9;
+        static const long ID_STATICTEXT11;
+        static const long ID_STATICTEXT12;
         static const long ID_CONTROL_PANEL;
         static const long ID_FIELD_DC_CLIENT;
         static const long ID_STATICTEXT8;
@@ -93,12 +103,14 @@ class dwa_demoFrame: public wxFrame
         //(*Declarations(dwa_demoFrame)
         wxButton* new_map_button;
         wxButton* start_button;
-        wxCheckBox* sbs_checkbox;
         wxClientDC* dwa_dc_client;
         wxClientDC* field_dc_client;
         wxPanel* control_panel;
         wxPanel* dwa_panel;
         wxPanel* map_panel;
+        wxStaticText* StaticText10;
+        wxStaticText* StaticText11;
+        wxStaticText* StaticText12;
         wxStaticText* StaticText1;
         wxStaticText* StaticText2;
         wxStaticText* StaticText3;
@@ -107,15 +119,26 @@ class dwa_demoFrame: public wxFrame
         wxStaticText* StaticText6;
         wxStaticText* StaticText7;
         wxStaticText* StaticText8;
-        wxTextCtrl* TextCtrl7;
-        wxTextCtrl* TextCtrl8;
-        wxTextCtrl* TextCtrl9;
-        wxTextCtrl* contr_freq_txt_ctrl;
+        wxStaticText* StaticText9;
+        wxTextCtrl* accur_txt_ctrl;
+        wxTextCtrl* bord_txt_ctrl;
+        wxTextCtrl* cycle_txt_ctrl;
+        wxTextCtrl* dwa_ka_txt_ctrl;
+        wxTextCtrl* dwa_kd_txt_ctrl;
+        wxTextCtrl* dwa_ks_txt_ctrl;
         wxTextCtrl* goal_x_txt_ctrl;
         wxTextCtrl* goal_y_txt_ctrl;
+        wxTextCtrl* m_max_ac_txt_ctrl;
+        wxTextCtrl* m_max_sp_txt_ctrl;
+        wxTextCtrl* pid_t_txt_ctrl;
+        wxTextCtrl* pr_steps_txt_ctrl;
+        wxTextCtrl* robot_l_txt_ctrl;
+        wxTextCtrl* robot_r_txt_ctrl;
         wxTextCtrl* robot_th_txt_ctrl;
+        wxTextCtrl* robot_w_txt_ctrl;
         wxTextCtrl* robot_x_txt_ctrl;
         wxTextCtrl* robot_y_txt_ctrl;
+        wxTextCtrl* traj_qnt_txt_ctrl;
         wxTimer controller_timer;
         wxTimer world_timer;
         //*)

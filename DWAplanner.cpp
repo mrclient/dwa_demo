@@ -6,28 +6,35 @@ DWAplanner::DWAplanner()
     robot = nullptr;
     goal = nullptr;
     world_map = nullptr;
+    //some constants just in case
+    prediction_steps = 5;
+    accuracy = 100.0; // in cm;
+    k_angle = 0.1;
+    k_dist = 0.02;
+    k_vel = 0.002;
 }
 
 
 double DWAplanner::angle_error(double px, double py, double ptheta)
 {
     double delta = (std::atan2(goal->y - py, goal->x - px) - ptheta);
-    if(delta > M_PI) delta = -(2*M_PI - delta);
-    if(delta < -M_PI) delta = 2*M_PI + delta;
+    if(delta > M_PI) delta = -(2 * M_PI - delta);
+    if(delta < -M_PI) delta = 2 * M_PI + delta;
     return delta;
 }
 
 
 double DWAplanner::max_free_distance(double new_wh_sp_1, double new_wh_sp_2, double dt)
 {
+    const double fully_safe_distance = 1000.0; // value for a case when no obstacles on a way
     double px, py, ptheta, pvel, pomega;
-    double safe_distance = 1000.0;
+    double safe_distance = fully_safe_distance;
 
     if(world_map == nullptr)
-        return 1000.0;
+        return fully_safe_distance;
 
     int i;
-    for(i = 5; i >= 1; i--)
+    for(i = prediction_steps; i >= 1; i--)
     {
         robot->predictState(new_wh_sp_1, new_wh_sp_2, i*dt, px, py, ptheta, pvel, pomega);
         if(collision_check(true, px, py, ptheta))
@@ -45,7 +52,7 @@ double DWAplanner::max_free_distance(double new_wh_sp_1, double new_wh_sp_2, dou
         }
     }
 
-    return (i == 5) ? 1000.0 : std::abs(safe_distance);
+    return (i == prediction_steps) ? fully_safe_distance : std::abs(safe_distance);
 }
 
 
@@ -58,9 +65,11 @@ int DWAplanner::leftTurn(const wxPoint& a, const wxPoint& b, const wxPoint& c)
 
 bool DWAplanner::collision_check(bool safe, double px, double py, double ptheta)
 {
-    wxPoint robot_pt1, robot_pt2;
-    if(world_map==nullptr)
+
+    if(world_map == nullptr)
         return false;
+
+    wxPoint robot_pt1, robot_pt2;
 
     std::vector<std::vector<wxPoint>>& obstacles = safe ? world_map->bigger_obstacles : world_map->obstacles;
     for(int j = 0; j < obstacles.size(); j++)
@@ -70,7 +79,7 @@ bool DWAplanner::collision_check(bool safe, double px, double py, double ptheta)
         {
             wxPoint obst_pt1 = obstacles[j][k];
             wxPoint obst_pt2 = obstacles[j][(k + 1) % sz];
-            for(int i = 0; i < 4; i++)
+            for(int i = 0; i < robot->local_footprint.size(); i++)
             {
                 robot->transformPoint(px, py, ptheta, robot->local_footprint[i], robot_pt1);
                 robot->transformPoint(px, py, ptheta, robot->local_footprint[(i+1)%4], robot_pt2);
@@ -87,7 +96,7 @@ bool DWAplanner::collision_check(bool safe, double px, double py, double ptheta)
 
 bool DWAplanner::checkAchievment()
 {
-    if(std::pow(robot->x - goal->x, 2) + std::pow(robot->y - goal->y, 2) < 100.0)
+    if(std::pow(robot->x - goal->x, 2) + std::pow(robot->y - goal->y, 2) < std::pow(accuracy,2))
         return true;
     return false;
 }
@@ -100,15 +109,18 @@ void DWAplanner::updateControl(double dt)
 
     double px, py, ptheta, pvel, pomega;
 
-    for(double wh1 = -4.0; wh1 <= 4.0; wh1 += 0.8)
+    for(double wh1 = -robot->max_wheel_speed; wh1 <= robot->max_wheel_speed; wh1 += 0.8)
     {
-        for(double wh2 = -4.0; wh2 <= 4.0; wh2 += 0.8)
+        for(double wh2 = -robot->max_wheel_speed; wh2 <= robot->max_wheel_speed; wh2 += 0.8)
         {
             robot->predictState(wh1, wh2, dt, px, py, ptheta, pvel, pomega);
             if(collision_check(true, px, py, ptheta))
                 continue;
-            cost = 0.1 * std::cos(angle_error(px, py, ptheta)) +  0.02 * max_free_distance(wh1, wh2, dt) +
-                   0.002 * pvel * std::cos(angle_error(px, py, ptheta));
+            double cost1 = std::cos(angle_error(px, py, ptheta));
+            double cost2 = max_free_distance(wh1, wh2, dt);
+            double cost3 = pvel;
+            cost = k_angle*cost1 + k_dist*cost2 + k_vel*cost3;
+//            cost = k_angle * std::cos(angle_error(px, py, ptheta)) + k_dist * max_free_distance(wh1, wh2, dt) + k_vel * pvel;
             if(cost > best_cost)
             {
                 best_cost = cost;
@@ -117,8 +129,6 @@ void DWAplanner::updateControl(double dt)
             }
         }
     }
-//        robot.predictState(best_wh1, best_wh2, 5*dt, px, py, ptheta, pvel, pomega);
-//        field_dc_client->DrawCircle(px, py, 10);
     robot->wh1_controller.setDesiredValue(best_wh1);
     robot->wh2_controller.setDesiredValue(best_wh2);
 }

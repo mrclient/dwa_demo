@@ -16,6 +16,10 @@ public:
     Map* world_map;
     Goal* goal;
     Robot* robot;
+    int prediction_steps;
+    int wheel_speed_step;
+    double accuracy;
+    double k_angle, k_dist, k_vel;
 
     DWAplanner();
     void updateControl(double dt);

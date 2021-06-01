@@ -5,6 +5,7 @@ void PID_sim::reset()
 {
     current_value = 0.0;
     desired_value = 0.0;
+    diff_val = 0.0;
     time = 0.0;
 }
 
@@ -14,6 +15,7 @@ double PID_sim::update(double dt)
     time += dt;
     return current_value = desired_value - diff_val * std::exp(-time / T);
 }
+
 
 void PID_sim::setDesiredValue(double goal)
 {
@@ -25,28 +27,37 @@ void PID_sim::setDesiredValue(double goal)
 
 Robot::Robot(){
 
+    // some initialization values just in case
     x = 100.0;
     y = 100.0;
     theta = 0.75;
+    length = 40;
     robot_wheel_width = 30.0;
     wheel_radius = 10.0;
+    max_wheel_speed = 4.0;
+    max_wheel_accel = 1.0;
+    controller_period = 500; // in ms
 
-    local_footprint.resize(4);
-    local_footprint[0].x = 10;
-    local_footprint[0].y = robot_wheel_width / 2.0;
-    local_footprint[1].x = 10;
-    local_footprint[1].y = - robot_wheel_width / 2.0;
-    local_footprint[2].x = -30;
-    local_footprint[2].y = - robot_wheel_width / 2.0;
-    local_footprint[3].x = -30;
-    local_footprint[3].y = robot_wheel_width / 2.0;
-
-    global_footprint.resize(4);
-    updateGlobalFootprint();
-    wh1_controller.T = 0.1;
-    wh2_controller.T = 0.1;
+    updateFootprints();
 }
 
+
+void Robot::updateFootprints()
+{
+    // robot form is a rectangle with specified sizes
+    local_footprint.resize(4);
+    local_footprint[0].x = length / 2;
+    local_footprint[0].y = robot_wheel_width / 2.0;
+    local_footprint[1].x = length / 2;
+    local_footprint[1].y = - robot_wheel_width / 2.0;
+    local_footprint[2].x = -length / 2;
+    local_footprint[2].y = - robot_wheel_width / 2.0;
+    local_footprint[3].x = -length / 2;
+    local_footprint[3].y = robot_wheel_width / 2.0;
+
+    global_footprint.resize(local_footprint.size());
+    updateGlobalFootprint();
+}
 
 void Robot::transformPoint(double x, double y, double theta, const wxPoint& from, wxPoint& to)
 {
@@ -56,7 +67,7 @@ void Robot::transformPoint(double x, double y, double theta, const wxPoint& from
 
 void Robot::updateGlobalFootprint()
 {
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < local_footprint.size(); i++)
         transformPoint(x, y, theta, local_footprint[i], global_footprint[i]);
 }
 
@@ -77,6 +88,7 @@ void Robot::updateRobotSpeeds()
 }
 
 
+// precise only with small dt
 void Robot::updateState(double dt)
 {
     x += v * std::cos(theta) * dt;
@@ -91,6 +103,16 @@ void Robot::updateState(double dt)
 }
 
 
+void Robot::getNewPose(double x_, double y_, double theta_)
+{
+    x = x_;
+    y = y_;
+    theta = (theta_ > M_PI) ? (theta_ - 2 * M_PI) : ((theta_ < -M_PI) ? (theta_ + 2 * M_PI) : theta_);
+    updateGlobalFootprint();
+}
+
+
+// precise with arbitrary dt when wheels speeds are constant
 void Robot::predictState(double new_wh_sp_1, double new_wh_sp_2, double dt,
                          double& px, double& py, double& ptheta, double& pv, double& pomega)
 {
@@ -106,7 +128,7 @@ void Robot::predictState(double new_wh_sp_1, double new_wh_sp_2, double dt,
 //        py = py + pv * std::sin(ptheta) * 0.01;
 //        ptheta = ptheta + pomega * 0.01;
 //    }
-    if(pomega <= 0.01 && pomega >= -0.01)
+    if(pomega <= 0.01 && pomega >= -0.01) // to prevent division by almost zero
     {
         px = x + pv * std::cos(theta) * dt;
         py = y + pv * std::sin(theta) * dt;
@@ -117,4 +139,5 @@ void Robot::predictState(double new_wh_sp_1, double new_wh_sp_2, double dt,
         py = y + pv / pomega * (std::cos(theta) - std::cos(pomega * dt + theta));
     }
     ptheta = theta + pomega * dt;
+    ptheta = (ptheta > M_PI) ? (ptheta - 2 * M_PI) : ((ptheta < -M_PI) ? (ptheta + 2 * M_PI) : ptheta);
 }
