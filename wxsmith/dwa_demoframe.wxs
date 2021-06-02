@@ -8,6 +8,30 @@
 		<id_arg>0</id_arg>
 		<style>wxCAPTION|wxCLOSE_BOX|wxMINIMIZE_BOX</style>
 		<handler function="OnClose" entry="EVT_CLOSE" />
+		<handler function="OnRepaint" entry="EVT_PAINT" />
+		<object class="wxPanel" name="ID_MAP_PANEL" variable="map_panel" member="yes">
+			<pos>10,10</pos>
+			<size>510,680</size>
+			<bg>#FFFFFF</bg>
+			<style>wxBORDER_SIMPLE|wxTAB_TRAVERSAL</style>
+			<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+				<label>(5.1 m; 6.8 m)</label>
+				<pos>410,648</pos>
+			</object>
+		</object>
+		<object class="wxPanel" name="ID_DWA_PANEL" variable="dwa_panel" member="yes">
+			<pos>530,480</pos>
+			<size>210,210</size>
+			<style>wxBORDER_SIMPLE|wxTAB_TRAVERSAL</style>
+			<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
+				<label>wh1</label>
+				<pos>176,108</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
+				<label>wh2</label>
+				<pos>64,1</pos>
+			</object>
+		</object>
 		<object class="wxPanel" name="ID_CONTROL_PANEL" variable="control_panel" member="yes">
 			<pos>530,10</pos>
 			<size>420,460</size>
@@ -51,7 +75,6 @@
 				<value>4.0</value>
 				<pos>8,184</pos>
 				<size>60,20</size>
-				<tooltip>Press Enter after input</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
 				<handler function="onTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
@@ -67,7 +90,6 @@
 				<value>4.0</value>
 				<pos>80,184</pos>
 				<size>60,20</size>
-				<tooltip>Press Enter after input</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
 				<handler function="onTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
@@ -131,7 +153,7 @@
 				<enabled>0</enabled>
 			</object>
 			<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
-				<label>Motor max. speed (1/s), max. accel (1/s^2), PID time (s):</label>
+				<label>Wheel max. speed (1/s), max. accel (1/s2), PID time (s):</label>
 				<pos>8,80</pos>
 			</object>
 			<object class="wxTextCtrl" name="ID_MAXSPEED_TEXTCTRL" variable="m_max_sp_txt_ctrl" member="yes">
@@ -208,42 +230,9 @@
 				<pos>192,144</pos>
 			</object>
 		</object>
-		<object class="wxPanel" name="ID_MAP_PANEL" variable="map_panel" member="yes">
-			<pos>10,10</pos>
-			<size>510,680</size>
-			<bg>#FFFFFF</bg>
-			<style>wxBORDER_SIMPLE|wxTAB_TRAVERSAL</style>
-			<handler function="Onfield_panelPaint" entry="EVT_PAINT" />
-			<object class="Custom" name="ID_FIELD_DC_CLIENT" subclass="wxClientDC" variable="field_dc_client" member="yes">
-				<creating_code>$(THIS) = new $(CLASS)($(PARENT));</creating_code>
-				<include_file>wx/dcclient.h</include_file>
-				<style></style>
-				<pos>8,24</pos>
-				<size>56,72</size>
-			</object>
-			<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
-				<label>(5.1 m; 6.8 m)</label>
-				<pos>410,648</pos>
-			</object>
-		</object>
-		<object class="wxPanel" name="ID_DWA_PANEL" variable="dwa_panel" member="yes">
-			<pos>530,480</pos>
-			<size>210,210</size>
-			<style>wxBORDER_SIMPLE|wxTAB_TRAVERSAL</style>
-			<object class="Custom" name="ID_DWA_DC_CLIENT" subclass="wxClientDC" variable="dwa_dc_client" member="yes">
-				<creating_code>$(THIS) = new $(CLASS)($(PARENT));</creating_code>
-				<style></style>
-				<pos>16,16</pos>
-				<size>47,47</size>
-			</object>
-			<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
-				<label>wh1</label>
-				<pos>176,108</pos>
-			</object>
-			<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
-				<label>wh2</label>
-				<pos>64,1</pos>
-			</object>
+		<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
+			<label>Don&apos;t forget to press&#x0A;Enter button after input&#x0A;any new values.</label>
+			<pos>752,488</pos>
 		</object>
 		<object class="wxTimer" name="ID_WORLD_TIMER" variable="world_timer" member="yes">
 			<interval>25</interval>
@@ -252,6 +241,11 @@
 		<object class="wxTimer" name="ID_CONTROLLER_TIMER" variable="controller_timer" member="yes">
 			<interval>500</interval>
 			<handler function="controllerTimerTickEvent" entry="EVT_TIMER" />
+		</object>
+		<object class="wxTimer" name="ID_REDRAW_TIMER" variable="redraw_timer" member="yes">
+			<interval>500</interval>
+			<oneshot>1</oneshot>
+			<handler function="redrawTimerTickEvt" entry="EVT_TIMER" />
 		</object>
 	</object>
 </wxsmith>

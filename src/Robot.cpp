@@ -45,19 +45,27 @@ Robot::Robot(){
 void Robot::updateFootprints()
 {
     // robot form is a rectangle with specified sizes
-    local_footprint.resize(4);
-    local_footprint[0].x = length / 2;
+    // and some bevels at its head side
+    const double length_bevel = 0.25;
+    const double width_bevel = 0.25;
+    local_footprint.resize(6);
+    local_footprint[0].x = length / 2 - length * length_bevel;
     local_footprint[0].y = robot_wheel_width / 2.0;
     local_footprint[1].x = length / 2;
-    local_footprint[1].y = - robot_wheel_width / 2.0;
-    local_footprint[2].x = -length / 2;
-    local_footprint[2].y = - robot_wheel_width / 2.0;
-    local_footprint[3].x = -length / 2;
-    local_footprint[3].y = robot_wheel_width / 2.0;
+    local_footprint[1].y = robot_wheel_width / 2.0 - robot_wheel_width * width_bevel;
+    local_footprint[2].x = length / 2;
+    local_footprint[2].y = -robot_wheel_width / 2.0 + robot_wheel_width * width_bevel;
+    local_footprint[3].x = length / 2 - length * length_bevel;
+    local_footprint[3].y = -robot_wheel_width / 2.0;
+    local_footprint[4].x = -length / 2;
+    local_footprint[4].y = -robot_wheel_width / 2.0;
+    local_footprint[5].x = -length / 2;
+    local_footprint[5].y = robot_wheel_width / 2.0;
 
     global_footprint.resize(local_footprint.size());
     updateGlobalFootprint();
 }
+
 
 void Robot::transformPoint(double x, double y, double theta, const wxPoint& from, wxPoint& to)
 {
@@ -65,11 +73,13 @@ void Robot::transformPoint(double x, double y, double theta, const wxPoint& from
     to.y = y + std::round(from.x * std::sin(theta) + from.y * std::cos(theta));
 }
 
+
 void Robot::updateGlobalFootprint()
 {
     for(int i = 0; i < local_footprint.size(); i++)
         transformPoint(x, y, theta, local_footprint[i], global_footprint[i]);
 }
+
 
 void Robot::stop()
 {
