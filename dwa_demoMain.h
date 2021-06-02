@@ -12,7 +12,6 @@
 
 //(*Headers(dwa_demoFrame)
 #include <wx/button.h>
-#include <wx/dcclient.h>
 #include <wx/frame.h>
 #include <wx/panel.h>
 #include <wx/stattext.h>
@@ -24,6 +23,7 @@
 #include "Robot.h"
 #include "DWAplanner.h"
 #include <wx/msgdlg.h>
+#include <wx/dcclient.h>
 
 class dwa_demoFrame: public wxFrame
 {
@@ -37,7 +37,9 @@ class dwa_demoFrame: public wxFrame
         Goal goal;
         DWAplanner dwa_planner;
         bool program_stopped;
+        bool redraw_required;
 
+        void clearMap();
         void drawMap();
         void drawRobot();
         void drawGoal();
@@ -59,6 +61,11 @@ class dwa_demoFrame: public wxFrame
         //*)
 
         //(*Identifiers(dwa_demoFrame)
+        static const long ID_STATICTEXT8;
+        static const long ID_MAP_PANEL;
+        static const long ID_STATICTEXT13;
+        static const long ID_STATICTEXT14;
+        static const long ID_DWA_PANEL;
         static const long ID_START_BUTTON;
         static const long ID_NEW_MAP_BUTTON;
         static const long ID_ROBOTX_TEXTCTRL;
@@ -92,13 +99,6 @@ class dwa_demoFrame: public wxFrame
         static const long ID_STATICTEXT11;
         static const long ID_STATICTEXT12;
         static const long ID_CONTROL_PANEL;
-        static const long ID_FIELD_DC_CLIENT;
-        static const long ID_STATICTEXT8;
-        static const long ID_MAP_PANEL;
-        static const long ID_DWA_DC_CLIENT;
-        static const long ID_STATICTEXT13;
-        static const long ID_STATICTEXT14;
-        static const long ID_DWA_PANEL;
         static const long ID_WORLD_TIMER;
         static const long ID_CONTROLLER_TIMER;
         //*)
@@ -106,8 +106,6 @@ class dwa_demoFrame: public wxFrame
         //(*Declarations(dwa_demoFrame)
         wxButton* new_map_button;
         wxButton* start_button;
-        wxClientDC* dwa_dc_client;
-        wxClientDC* field_dc_client;
         wxPanel* control_panel;
         wxPanel* dwa_panel;
         wxPanel* map_panel;

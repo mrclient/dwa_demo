@@ -43,6 +43,11 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 }
 
 //(*IdInit(dwa_demoFrame)
+const long dwa_demoFrame::ID_STATICTEXT8 = wxNewId();
+const long dwa_demoFrame::ID_MAP_PANEL = wxNewId();
+const long dwa_demoFrame::ID_STATICTEXT13 = wxNewId();
+const long dwa_demoFrame::ID_STATICTEXT14 = wxNewId();
+const long dwa_demoFrame::ID_DWA_PANEL = wxNewId();
 const long dwa_demoFrame::ID_START_BUTTON = wxNewId();
 const long dwa_demoFrame::ID_NEW_MAP_BUTTON = wxNewId();
 const long dwa_demoFrame::ID_ROBOTX_TEXTCTRL = wxNewId();
@@ -76,13 +81,6 @@ const long dwa_demoFrame::ID_STATICTEXT5 = wxNewId();
 const long dwa_demoFrame::ID_STATICTEXT11 = wxNewId();
 const long dwa_demoFrame::ID_STATICTEXT12 = wxNewId();
 const long dwa_demoFrame::ID_CONTROL_PANEL = wxNewId();
-const long dwa_demoFrame::ID_FIELD_DC_CLIENT = wxNewId();
-const long dwa_demoFrame::ID_STATICTEXT8 = wxNewId();
-const long dwa_demoFrame::ID_MAP_PANEL = wxNewId();
-const long dwa_demoFrame::ID_DWA_DC_CLIENT = wxNewId();
-const long dwa_demoFrame::ID_STATICTEXT13 = wxNewId();
-const long dwa_demoFrame::ID_STATICTEXT14 = wxNewId();
-const long dwa_demoFrame::ID_DWA_PANEL = wxNewId();
 const long dwa_demoFrame::ID_WORLD_TIMER = wxNewId();
 const long dwa_demoFrame::ID_CONTROLLER_TIMER = wxNewId();
 //*)
@@ -98,6 +96,12 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     Create(parent, wxID_ANY, _("DWA planner work demonstration program"), wxDefaultPosition, wxDefaultSize, wxCAPTION|wxCLOSE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(960,700));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+    map_panel = new wxPanel(this, ID_MAP_PANEL, wxPoint(10,10), wxSize(510,680), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_MAP_PANEL"));
+    map_panel->SetBackgroundColour(wxColour(255,255,255));
+    StaticText8 = new wxStaticText(map_panel, ID_STATICTEXT8, _("(5.1 m; 6.8 m)"), wxPoint(410,648), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    dwa_panel = new wxPanel(this, ID_DWA_PANEL, wxPoint(530,480), wxSize(210,210), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_DWA_PANEL"));
+    StaticText13 = new wxStaticText(dwa_panel, ID_STATICTEXT13, _("wh1"), wxPoint(176,108), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+    StaticText14 = new wxStaticText(dwa_panel, ID_STATICTEXT14, _("wh2"), wxPoint(64,1), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     control_panel = new wxPanel(this, ID_CONTROL_PANEL, wxPoint(530,10), wxSize(420,460), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_CONTROL_PANEL"));
     control_panel->SetMaxSize(wxSize(210,600));
     start_button = new wxButton(control_panel, ID_START_BUTTON, _("Start"), wxPoint(80,425), wxSize(80,30), 0, wxDefaultValidator, _T("ID_START_BUTTON"));
@@ -139,20 +143,13 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     StaticText5 = new wxStaticText(control_panel, ID_STATICTEXT5, _("DWA PLANNER"), wxPoint(168,216), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     StaticText11 = new wxStaticText(control_panel, ID_STATICTEXT11, _("Prediction steps number, N param"), wxPoint(8,352), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
     StaticText12 = new wxStaticText(control_panel, ID_STATICTEXT12, _("GOAL"), wxPoint(192,144), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-    map_panel = new wxPanel(this, ID_MAP_PANEL, wxPoint(10,10), wxSize(510,680), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_MAP_PANEL"));
-    map_panel->SetBackgroundColour(wxColour(255,255,255));
-    field_dc_client = new wxClientDC(map_panel);
-    StaticText8 = new wxStaticText(map_panel, ID_STATICTEXT8, _("(5.1 m; 6.8 m)"), wxPoint(410,648), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
-    dwa_panel = new wxPanel(this, ID_DWA_PANEL, wxPoint(530,480), wxSize(210,210), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_DWA_PANEL"));
-    dwa_dc_client = new wxClientDC(dwa_panel);
-    StaticText13 = new wxStaticText(dwa_panel, ID_STATICTEXT13, _("wh1"), wxPoint(176,108), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
-    StaticText14 = new wxStaticText(dwa_panel, ID_STATICTEXT14, _("wh2"), wxPoint(64,1), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     world_timer.SetOwner(this, ID_WORLD_TIMER);
     world_timer.Start(25, false);
     controller_timer.SetOwner(this, ID_CONTROLLER_TIMER);
     controller_timer.Start(500, false);
     Center();
 
+    map_panel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&dwa_demoFrame::Onfield_panelPaint,0,this);
     Connect(ID_START_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnStartButtonClick);
     Connect(ID_NEW_MAP_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnNewMapButtonClick);
     Connect(ID_ROBOTX_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onTextEnter);
@@ -173,7 +170,6 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_DWA_KS_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onTextEnter);
     Connect(ID_ACCUR_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onTextEnter);
     Connect(ID_BORD_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onTextEnter);
-    map_panel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&dwa_demoFrame::Onfield_panelPaint,0,this);
     Connect(ID_WORLD_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::mainTimerTickEvt);
     Connect(ID_CONTROLLER_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::controllerTimerTickEvent);
     Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&dwa_demoFrame::OnClose);
@@ -181,6 +177,7 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
 
     world_map = nullptr;
     program_stopped = true;
+    redraw_required = true;
     dwa_planner.robot = &robot;
     dwa_planner.goal = &goal;
 }
@@ -191,19 +188,31 @@ dwa_demoFrame::~dwa_demoFrame()
     //*)
 }
 
+
+void dwa_demoFrame::clearMap()
+{
+    wxClientDC field_dc_client(map_panel);
+    field_dc_client.Clear();
+}
+
+
 void dwa_demoFrame::drawMap()
 {
-    wxPen orig_pen = field_dc_client->GetPen();
-    field_dc_client->SetPen(wxPen(wxColour(0, 255, 0))); // green color
+    if(world_map == nullptr)
+        return;
+    wxClientDC field_dc_client(map_panel);
+    wxPen orig_pen = field_dc_client.GetPen();
+
+    field_dc_client.SetPen(wxPen(wxColour(0, 255, 0))); // green color
     for(int i = 0; i < world_map->obstacle_num; i++)
     {
-        field_dc_client->DrawPolygon(world_map->bigger_obstacles[i].size(), world_map->bigger_obstacles[i].data());
+        field_dc_client.DrawPolygon(world_map->bigger_obstacles[i].size(), world_map->bigger_obstacles[i].data());
     }
 
-    field_dc_client->SetPen(orig_pen);
+    field_dc_client.SetPen(orig_pen);
     for(int i = 0; i < world_map->obstacle_num; i++)
     {
-        field_dc_client->DrawPolygon(world_map->obstacles[i].size(), world_map->obstacles[i].data());
+        field_dc_client.DrawPolygon(world_map->obstacles[i].size(), world_map->obstacles[i].data());
     }
 
 }
@@ -211,15 +220,17 @@ void dwa_demoFrame::drawMap()
 
 void dwa_demoFrame::drawRobot()
 {
-    wxPen orig_pen = field_dc_client->GetPen();
+    wxClientDC field_dc_client(map_panel);
+    wxPen orig_pen = field_dc_client.GetPen();
     static std::vector<wxPoint> last_footprint;
+
     if(last_footprint.size() == robot.global_footprint.size())
     {
-        field_dc_client->SetPen(wxPen(wxColour(255, 255, 255), 2)); // white color with width = 2
-        field_dc_client->DrawPolygon(last_footprint.size(), last_footprint.data());
+        field_dc_client.SetPen(wxPen(wxColour(255, 255, 255), 3)); // white color with width = 3
+        field_dc_client.DrawPolygon(last_footprint.size(), last_footprint.data());
     }
-    field_dc_client->SetPen(orig_pen);
-    field_dc_client->DrawPolygon(robot.global_footprint.size(), robot.global_footprint.data());
+    field_dc_client.SetPen(orig_pen);
+    field_dc_client.DrawPolygon(robot.global_footprint.size(), robot.global_footprint.data());
     last_footprint = robot.global_footprint;
 }
 
@@ -227,32 +238,34 @@ void dwa_demoFrame::drawRobot()
 void dwa_demoFrame::drawGoal()
 {
     static int last_x = -1, last_y = -1;
-    wxPen orig_pen = field_dc_client->GetPen();
+    wxClientDC field_dc_client(map_panel);
+    wxPen orig_pen = field_dc_client.GetPen();
 
     if(last_x != -1 && last_y != -1)
     {
-        field_dc_client->SetPen(wxPen(wxColour(255, 255, 255))); // white color
-        field_dc_client->DrawCircle(last_x, last_y, goal.graph_radius + 1);
+        field_dc_client.SetPen(wxPen(wxColour(255, 255, 255))); // white color
+        field_dc_client.DrawCircle(last_x, last_y, goal.graph_radius + 1);
     }
 
     last_x = goal.x;
     last_y = goal.y;
-    field_dc_client->SetPen(wxPen(wxColour(255, 0, 0))); // red color
-    field_dc_client->DrawCircle(last_x, last_y, goal.graph_radius);
-    field_dc_client->SetPen(orig_pen);
+    field_dc_client.SetPen(wxPen(wxColour(255, 0, 0))); // red color
+    field_dc_client.DrawCircle(last_x, last_y, goal.graph_radius);
+    field_dc_client.SetPen(orig_pen);
 }
 
 
 void dwa_demoFrame::drawDWAwindow()
 {
     int w, h;
-    dwa_dc_client->GetSize(&w, &h);
-    dwa_dc_client->DrawLine(wxPoint(0, h/2), wxPoint(w, h/2));
-    dwa_dc_client->DrawLine(wxPoint(w/2, 0), wxPoint(w/2, h));
+    wxClientDC dwa_dc_client(dwa_panel);
+    dwa_dc_client.GetSize(&w, &h);
+    dwa_dc_client.DrawLine(wxPoint(0, h/2), wxPoint(w, h/2));
+    dwa_dc_client.DrawLine(wxPoint(w/2, 0), wxPoint(w/2, h));
     static std::vector<wxPoint> last_window(2);
     std::vector<wxPoint> window(4);
 
-    wxPen orig_pen = dwa_dc_client->GetPen();
+    wxPen orig_pen = dwa_dc_client.GetPen();
     dwa_planner.updateWindowBorders(controller_timer.GetInterval()/1000.0);
     window[0].x = dwa_planner.wh1_min / robot.max_wheel_speed * w / 2.0 + w / 2.0;
     window[1].x = dwa_planner.wh1_max / robot.max_wheel_speed * w / 2.0 + w / 2.0;
@@ -265,12 +278,12 @@ void dwa_demoFrame::drawDWAwindow()
 
     if(last_window.size() == window.size())
     {
-        dwa_dc_client->SetPen(wxPen(wxColour(255, 255, 255), 2));
-        dwa_dc_client->DrawPolygon(last_window.size(), last_window.data());
+        dwa_dc_client.SetPen(wxPen(wxColour(255, 255, 255), 3)); // white color with width = 3
+        dwa_dc_client.DrawPolygon(last_window.size(), last_window.data());
     }
-    dwa_dc_client->SetPen(wxPen(wxColour(0, 0, 255)));
-    dwa_dc_client->DrawPolygon(window.size(), window.data());
-    dwa_dc_client->SetPen(orig_pen);
+    dwa_dc_client.SetPen(wxPen(wxColour(0, 0, 255))); // blue color
+    dwa_dc_client.DrawPolygon(window.size(), window.data());
+    dwa_dc_client.SetPen(orig_pen);
     last_window = window;
 }
 
@@ -336,8 +349,7 @@ void dwa_demoFrame::readTextFields()
     traj_qnt_txt_ctrl->GetValue().ToDouble(&aux);
     dwa_planner.wheel_speed_step = aux - 1;
 
-
-    field_dc_client->Clear();
+    clearMap();
     bord_txt_ctrl->GetValue().ToDouble(&aux);
     if(world_map != nullptr){
         world_map->safety_adding = aux * 100;
@@ -359,9 +371,8 @@ void dwa_demoFrame::OnClose(wxCloseEvent& event)
 
 void dwa_demoFrame::Onfield_panelPaint(wxPaintEvent& event)
 {
-    readTextFields();
-    if(world_map != nullptr)
-        drawMap();
+    wxPaintDC dc(map_panel);
+    redraw_required = true;
 }
 
 
@@ -373,7 +384,7 @@ void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
     world_map->create(map_panel->GetSize());
     dwa_planner.world_map = world_map;
 
-    field_dc_client->Clear();
+    clearMap();
     readTextFields();
 
 }
@@ -381,6 +392,11 @@ void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
 
 void dwa_demoFrame::mainTimerTickEvt(wxTimerEvent& event)
 {
+    if(redraw_required){
+        readTextFields();
+        this->Update();
+        redraw_required = false;
+    }
     if(!program_stopped)
     {
         robot_x_txt_ctrl->SetValue(std::to_string(robot.x / 100.0)); // from cm to m
@@ -408,8 +424,7 @@ void dwa_demoFrame::controllerTimerTickEvent(wxTimerEvent& event)
 {
     if(!program_stopped)
     {
-        if(world_map != nullptr)
-            drawMap();
+        drawMap();
         if(dwa_planner.checkAchievment())
             stopProcedure();
         else
