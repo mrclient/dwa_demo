@@ -102,6 +102,15 @@ bool DWAplanner::checkAchievment()
 }
 
 
+void DWAplanner::updateWindowBorders(double dt)
+{
+    wh1_min = std::max(robot->wheel_speed_1 - robot->max_wheel_accel * dt, -robot->max_wheel_speed);
+    wh1_max = std::min(robot->wheel_speed_1 + robot->max_wheel_accel * dt, robot->max_wheel_speed);
+    wh2_min = std::max(robot->wheel_speed_2 - robot->max_wheel_accel * dt, -robot->max_wheel_speed);
+    wh2_max = std::min(robot->wheel_speed_2 + robot->max_wheel_accel * dt, robot->max_wheel_speed);
+}
+
+
 void DWAplanner::updateControl(double dt)
 {
     double best_wh1 = 0.0, best_wh2 = 0.0;
@@ -109,9 +118,12 @@ void DWAplanner::updateControl(double dt)
 
     double px, py, ptheta, pvel, pomega;
 
-    for(double wh1 = -robot->max_wheel_speed; wh1 <= robot->max_wheel_speed; wh1 += 0.8)
+    // finding of optimal trajectory
+    double dw = 2 * robot->max_wheel_accel * dt / wheel_speed_step;
+    updateWindowBorders(dt);
+    for(double wh1 = wh1_min; wh1 <= wh1_max; wh1 += dw)
     {
-        for(double wh2 = -robot->max_wheel_speed; wh2 <= robot->max_wheel_speed; wh2 += 0.8)
+        for(double wh2 = wh2_min; wh2 <= wh2_max; wh2 += dw)
         {
             robot->predictState(wh1, wh2, dt, px, py, ptheta, pvel, pomega);
             if(collision_check(true, px, py, ptheta))

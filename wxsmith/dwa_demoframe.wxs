@@ -99,10 +99,10 @@
 				<pos>8,240</pos>
 			</object>
 			<object class="wxTextCtrl" name="ID_TRAJQNT_TEXTCTRL" variable="traj_qnt_txt_ctrl" member="yes">
-				<value>3</value>
+				<value>5</value>
 				<pos>80,376</pos>
 				<size>60,20</size>
-				<tooltip>Check N*N trajectories</tooltip>
+				<tooltip>No more than N*N trajectories will be checked</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
 				<handler function="onTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
@@ -177,7 +177,7 @@
 				<handler function="onTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
 			<object class="wxTextCtrl" name="ID_ACCUR_TEXTCTRL" variable="accur_txt_ctrl" member="yes">
-				<value>0.1</value>
+				<value>0.2</value>
 				<pos>8,320</pos>
 				<size>60,20</size>
 				<tooltip>Goal achievement accuracy</tooltip>
@@ -235,6 +235,14 @@
 				<style></style>
 				<pos>16,16</pos>
 				<size>47,47</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
+				<label>wh1</label>
+				<pos>176,108</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
+				<label>wh2</label>
+				<pos>64,1</pos>
 			</object>
 		</object>
 		<object class="wxTimer" name="ID_WORLD_TIMER" variable="world_timer" member="yes">

@@ -20,11 +20,13 @@ public:
     int wheel_speed_step;
     double accuracy;
     double k_angle, k_dist, k_vel;
+    double wh1_min, wh1_max, wh2_min, wh2_max;
 
     DWAplanner();
     void updateControl(double dt);
     bool checkAchievment();
     bool collision_check(bool safe, double px, double py, double ptheta);
+    void updateWindowBorders(double dt);
 };
 
 #endif // DWAPLANNER_H_INCLUDED

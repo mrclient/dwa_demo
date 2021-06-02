@@ -1503,7 +1503,7 @@
 1618266238 c:\dev_progs\wxwidgets\include\wx\univ\theme.h
 	"wx/string.h"
 
-1622588820 c:\users\anton\desktop\dwa_demo\dwa_demomain.h
+1622596896 c:\users\anton\desktop\dwa_demo\dwa_demomain.h
 	<wx/button.h>
 	<wx/dcclient.h>
 	<wx/frame.h>
@@ -1604,7 +1604,7 @@
 
 1618266238 c:\dev_progs\wxwidgets\include\wx\msw\rcdefs.h
 
-1622588820 source:c:\users\anton\desktop\dwa_demo\dwa_demomain.cpp
+1622598360 source:c:\users\anton\desktop\dwa_demo\dwa_demomain.cpp
 	"dwa_demoMain.h"
 	<wx/intl.h>
 	<wx/settings.h>
@@ -1908,11 +1908,11 @@
 	"wx/longlong.h"
 	"wx/time.h"
 
-1622579937 c:\users\anton\desktop\dwa_demo\dwaplanner.h
+1622596269 c:\users\anton\desktop\dwa_demo\dwaplanner.h
 	<wx/app.h>
 	"Map.h"
 	"Robot.h"
 
-1622590685 source:c:\users\anton\desktop\dwa_demo\dwaplanner.cpp
+1622596264 source:c:\users\anton\desktop\dwa_demo\dwaplanner.cpp
 	"DWAplanner.h"
 

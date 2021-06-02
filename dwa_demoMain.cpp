@@ -80,6 +80,8 @@ const long dwa_demoFrame::ID_FIELD_DC_CLIENT = wxNewId();
 const long dwa_demoFrame::ID_STATICTEXT8 = wxNewId();
 const long dwa_demoFrame::ID_MAP_PANEL = wxNewId();
 const long dwa_demoFrame::ID_DWA_DC_CLIENT = wxNewId();
+const long dwa_demoFrame::ID_STATICTEXT13 = wxNewId();
+const long dwa_demoFrame::ID_STATICTEXT14 = wxNewId();
 const long dwa_demoFrame::ID_DWA_PANEL = wxNewId();
 const long dwa_demoFrame::ID_WORLD_TIMER = wxNewId();
 const long dwa_demoFrame::ID_CONTROLLER_TIMER = wxNewId();
@@ -116,8 +118,8 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     pr_steps_txt_ctrl = new wxTextCtrl(control_panel, ID_PRED_TEXTCTRL, _("5"), wxPoint(8,376), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_PRED_TEXTCTRL"));
     pr_steps_txt_ctrl->SetToolTip(_("Each trajectory is checked for collisions for T*the_number seconds."));
     StaticText7 = new wxStaticText(control_panel, ID_STATICTEXT7, _("K angle, K distance, K speed:"), wxPoint(8,240), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
-    traj_qnt_txt_ctrl = new wxTextCtrl(control_panel, ID_TRAJQNT_TEXTCTRL, _("3"), wxPoint(80,376), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TRAJQNT_TEXTCTRL"));
-    traj_qnt_txt_ctrl->SetToolTip(_("Check N*N trajectories"));
+    traj_qnt_txt_ctrl = new wxTextCtrl(control_panel, ID_TRAJQNT_TEXTCTRL, _("5"), wxPoint(80,376), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TRAJQNT_TEXTCTRL"));
+    traj_qnt_txt_ctrl->SetToolTip(_("No more than N*N trajectories will be checked"));
     StaticText9 = new wxStaticText(control_panel, ID_STATICTEXT9, _("L (m), W (m),  wheel radius (m):"), wxPoint(208,32), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
     robot_l_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTL_TEXTCTRL, _("0.4"), wxPoint(208,56), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ROBOTL_TEXTCTRL"));
     robot_w_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTW_TEXTCTRL, _("0.3"), wxPoint(280,56), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ROBOTW_TEXTCTRL"));
@@ -130,7 +132,7 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     dwa_ka_txt_ctrl = new wxTextCtrl(control_panel, ID_TEXTCTRL10, _("0.1"), wxPoint(8,264), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL10"));
     dwa_kd_txt_ctrl = new wxTextCtrl(control_panel, ID_DWA_KD_TEXTCTRL, _("0.02"), wxPoint(80,264), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_DWA_KD_TEXTCTRL"));
     dwa_ks_txt_ctrl = new wxTextCtrl(control_panel, ID_DWA_KS_TEXTCTRL, _("0.002"), wxPoint(152,264), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_DWA_KS_TEXTCTRL"));
-    accur_txt_ctrl = new wxTextCtrl(control_panel, ID_ACCUR_TEXTCTRL, _("0.1"), wxPoint(8,320), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ACCUR_TEXTCTRL"));
+    accur_txt_ctrl = new wxTextCtrl(control_panel, ID_ACCUR_TEXTCTRL, _("0.2"), wxPoint(8,320), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ACCUR_TEXTCTRL"));
     accur_txt_ctrl->SetToolTip(_("Goal achievement accuracy"));
     bord_txt_ctrl = new wxTextCtrl(control_panel, ID_BORD_TEXTCTRL, _("0.05"), wxPoint(80,320), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_BORD_TEXTCTRL"));
     StaticText4 = new wxStaticText(control_panel, ID_STATICTEXT4, _("ROBOT"), wxPoint(184,8), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -143,6 +145,8 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     StaticText8 = new wxStaticText(map_panel, ID_STATICTEXT8, _("(5.1 m; 6.8 m)"), wxPoint(410,648), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     dwa_panel = new wxPanel(this, ID_DWA_PANEL, wxPoint(530,480), wxSize(210,210), wxBORDER_SIMPLE|wxTAB_TRAVERSAL, _T("ID_DWA_PANEL"));
     dwa_dc_client = new wxClientDC(dwa_panel);
+    StaticText13 = new wxStaticText(dwa_panel, ID_STATICTEXT13, _("wh1"), wxPoint(176,108), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+    StaticText14 = new wxStaticText(dwa_panel, ID_STATICTEXT14, _("wh2"), wxPoint(64,1), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     world_timer.SetOwner(this, ID_WORLD_TIMER);
     world_timer.Start(25, false);
     controller_timer.SetOwner(this, ID_CONTROLLER_TIMER);
@@ -239,6 +243,38 @@ void dwa_demoFrame::drawGoal()
 }
 
 
+void dwa_demoFrame::drawDWAwindow()
+{
+    int w, h;
+    dwa_dc_client->GetSize(&w, &h);
+    dwa_dc_client->DrawLine(wxPoint(0, h/2), wxPoint(w, h/2));
+    dwa_dc_client->DrawLine(wxPoint(w/2, 0), wxPoint(w/2, h));
+    static std::vector<wxPoint> last_window(2);
+    std::vector<wxPoint> window(4);
+
+    wxPen orig_pen = dwa_dc_client->GetPen();
+    dwa_planner.updateWindowBorders(controller_timer.GetInterval()/1000.0);
+    window[0].x = dwa_planner.wh1_min / robot.max_wheel_speed * w / 2.0 + w / 2.0;
+    window[1].x = dwa_planner.wh1_max / robot.max_wheel_speed * w / 2.0 + w / 2.0;
+    window[2].x = dwa_planner.wh1_max / robot.max_wheel_speed * w / 2.0 + w / 2.0;
+    window[3].x = dwa_planner.wh1_min / robot.max_wheel_speed * w / 2.0 + w / 2.0;
+    window[0].y = h / 2.0 - dwa_planner.wh2_max / robot.max_wheel_speed * h / 2.0;
+    window[1].y = h / 2.0 - dwa_planner.wh2_max / robot.max_wheel_speed * h / 2.0;
+    window[2].y = h / 2.0 - dwa_planner.wh2_min / robot.max_wheel_speed * h / 2.0;
+    window[3].y = h / 2.0 - dwa_planner.wh2_min / robot.max_wheel_speed * h / 2.0;
+
+    if(last_window.size() == window.size())
+    {
+        dwa_dc_client->SetPen(wxPen(wxColour(255, 255, 255), 2));
+        dwa_dc_client->DrawPolygon(last_window.size(), last_window.data());
+    }
+    dwa_dc_client->SetPen(wxPen(wxColour(0, 0, 255)));
+    dwa_dc_client->DrawPolygon(window.size(), window.data());
+    dwa_dc_client->SetPen(orig_pen);
+    last_window = window;
+}
+
+
 void dwa_demoFrame::stopProcedure()
 {
     if(program_stopped)
@@ -298,7 +334,7 @@ void dwa_demoFrame::readTextFields()
     pr_steps_txt_ctrl->GetValue().ToDouble(&aux);
     dwa_planner.prediction_steps = aux;
     traj_qnt_txt_ctrl->GetValue().ToDouble(&aux);
-    dwa_planner.wheel_speed_step = aux;
+    dwa_planner.wheel_speed_step = aux - 1;
 
 
     field_dc_client->Clear();
@@ -311,6 +347,7 @@ void dwa_demoFrame::readTextFields()
 
     drawGoal();
     drawRobot();
+    drawDWAwindow();
 }
 
 
@@ -357,6 +394,7 @@ void dwa_demoFrame::mainTimerTickEvt(wxTimerEvent& event)
         }
         drawRobot();
     }
+    drawDWAwindow();
 }
 
 

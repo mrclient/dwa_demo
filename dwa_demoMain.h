@@ -41,6 +41,7 @@ class dwa_demoFrame: public wxFrame
         void drawMap();
         void drawRobot();
         void drawGoal();
+        void drawDWAwindow();
         void stopProcedure();
         void readTextFields();
 
@@ -95,6 +96,8 @@ class dwa_demoFrame: public wxFrame
         static const long ID_STATICTEXT8;
         static const long ID_MAP_PANEL;
         static const long ID_DWA_DC_CLIENT;
+        static const long ID_STATICTEXT13;
+        static const long ID_STATICTEXT14;
         static const long ID_DWA_PANEL;
         static const long ID_WORLD_TIMER;
         static const long ID_CONTROLLER_TIMER;
@@ -111,6 +114,8 @@ class dwa_demoFrame: public wxFrame
         wxStaticText* StaticText10;
         wxStaticText* StaticText11;
         wxStaticText* StaticText12;
+        wxStaticText* StaticText13;
+        wxStaticText* StaticText14;
         wxStaticText* StaticText1;
         wxStaticText* StaticText2;
         wxStaticText* StaticText3;
