@@ -30,7 +30,7 @@ wxWidgets library was installed using *Case B* insructions from [here](https://w
 
 Having wxWidgets installed application for Linux can be built with the command:
 ```console
-$ g++ *.cpp `wx-config --cxxflags --libs` -o ./bin/Release/Linux/dwa_demo
+$ g++ -Iinclude src/*.cpp `wx-config --cxxflags --libs` -o ./bin/Release/Linux/dwa_demo
 ```
 
 ## Screenshots
