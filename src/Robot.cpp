@@ -56,6 +56,7 @@ void Robot::updateFootprints()
     local_footprint[3].y = robot_wheel_width / 2.0;
 
     global_footprint.resize(local_footprint.size());
+    heading_arrow.resize(3); // triangular indicator showing robot heading
     updateGlobalFootprint();
 }
 
@@ -69,6 +70,12 @@ void Robot::updateGlobalFootprint()
 {
     for(int i = 0; i < local_footprint.size(); i++)
         transformPoint(x, y, theta, local_footprint[i], global_footprint[i]);
+    heading_arrow[0].x = (global_footprint[0].x + global_footprint[3].x) / 2.0;
+    heading_arrow[0].y = (global_footprint[0].y + global_footprint[3].y) / 2.0;
+    heading_arrow[1].x = (global_footprint[0].x + global_footprint[1].x) / 2.0;
+    heading_arrow[1].y = (global_footprint[0].y + global_footprint[1].y) / 2.0;
+    heading_arrow[2].x = (global_footprint[1].x + global_footprint[2].x) / 2.0;
+    heading_arrow[2].y = (global_footprint[1].y + global_footprint[2].y) / 2.0;
 }
 
 void Robot::stop()

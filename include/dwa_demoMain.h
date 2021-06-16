@@ -52,7 +52,7 @@ class dwa_demoFrame: public wxFrame
 
         //(*Handlers(dwa_demoFrame)
         void OnClose(wxCloseEvent& event);
-        void Onfield_panelPaint(wxPaintEvent& event);
+        void OnRepaint(wxPaintEvent& event);
         void OnNewMapButtonClick(wxCommandEvent& event);
         void mainTimerTickEvt(wxTimerEvent& event);
         void OnStartButtonClick(wxCommandEvent& event);
@@ -99,6 +99,7 @@ class dwa_demoFrame: public wxFrame
         static const long ID_STATICTEXT11;
         static const long ID_STATICTEXT12;
         static const long ID_CONTROL_PANEL;
+        static const long ID_STATICTEXT15;
         static const long ID_WORLD_TIMER;
         static const long ID_CONTROLLER_TIMER;
         //*)
@@ -114,6 +115,7 @@ class dwa_demoFrame: public wxFrame
         wxStaticText* StaticText12;
         wxStaticText* StaticText13;
         wxStaticText* StaticText14;
+        wxStaticText* StaticText15;
         wxStaticText* StaticText1;
         wxStaticText* StaticText2;
         wxStaticText* StaticText3;

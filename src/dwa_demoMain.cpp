@@ -81,6 +81,7 @@ const long dwa_demoFrame::ID_STATICTEXT5 = wxNewId();
 const long dwa_demoFrame::ID_STATICTEXT11 = wxNewId();
 const long dwa_demoFrame::ID_STATICTEXT12 = wxNewId();
 const long dwa_demoFrame::ID_CONTROL_PANEL = wxNewId();
+const long dwa_demoFrame::ID_STATICTEXT15 = wxNewId();
 const long dwa_demoFrame::ID_WORLD_TIMER = wxNewId();
 const long dwa_demoFrame::ID_CONTROLLER_TIMER = wxNewId();
 //*)
@@ -111,11 +112,9 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     robot_y_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTY_TEXTCTRL, _("1.0"), wxPoint(72,56), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ROBOTY_TEXTCTRL"));
     robot_th_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTTH_TEXTCTRL, _("0.0"), wxPoint(136,56), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ROBOTTH_TEXTCTRL"));
     goal_x_txt_ctrl = new wxTextCtrl(control_panel, ID_GOALX_TEXTCTRL, _("4.0"), wxPoint(8,184), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_GOALX_TEXTCTRL"));
-    goal_x_txt_ctrl->SetToolTip(_("Press Enter after input"));
     StaticText1 = new wxStaticText(control_panel, ID_STATICTEXT1, _("x (m), y(m), theta (rad)"), wxPoint(32,32), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     StaticText2 = new wxStaticText(control_panel, ID_STATICTEXT2, _("x(m), y(m)"), wxPoint(40,160), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     goal_y_txt_ctrl = new wxTextCtrl(control_panel, ID_GOALY_TEXTCTRL, _("4.0"), wxPoint(80,184), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_GOALY_TEXTCTRL"));
-    goal_y_txt_ctrl->SetToolTip(_("Press Enter after input"));
     StaticText3 = new wxStaticText(control_panel, ID_STATICTEXT3, _("Accuracy (m), safety border (m)"), wxPoint(8,296), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     StaticText6 = new wxStaticText(control_panel, ID_STATICTEXT6, _("Cycle period T (s)"), wxPoint(256,240), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     cycle_txt_ctrl = new wxTextCtrl(control_panel, ID_CYCLE_TEXTCTRL, _("0.5"), wxPoint(280,264), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_CYCLE_TEXTCTRL"));
@@ -129,7 +128,7 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     robot_w_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTW_TEXTCTRL, _("0.3"), wxPoint(280,56), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_ROBOTW_TEXTCTRL"));
     robot_r_txt_ctrl = new wxTextCtrl(control_panel, ID_ROBOTR_TEXTCTRL, _("0.1"), wxPoint(352,56), wxSize(60,20), 0, wxDefaultValidator, _T("ID_ROBOTR_TEXTCTRL"));
     robot_r_txt_ctrl->Disable();
-    StaticText10 = new wxStaticText(control_panel, ID_STATICTEXT10, _("Motor max. speed (1/s), max. accel (1/s^2), PID time (s):"), wxPoint(8,80), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+    StaticText10 = new wxStaticText(control_panel, ID_STATICTEXT10, _("Wheel max. speed (1/s), max. accel (1/s²), PID time (s):"), wxPoint(8,80), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
     m_max_sp_txt_ctrl = new wxTextCtrl(control_panel, ID_MAXSPEED_TEXTCTRL, _("4.0"), wxPoint(8,104), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_MAXSPEED_TEXTCTRL"));
     m_max_ac_txt_ctrl = new wxTextCtrl(control_panel, ID_MAXACC_TEXTCTRL, _("1.0"), wxPoint(80,104), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_MAXACC_TEXTCTRL"));
     pid_t_txt_ctrl = new wxTextCtrl(control_panel, ID_PID_TEXTCTRL, _("0.1"), wxPoint(152,104), wxSize(60,20), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_PID_TEXTCTRL"));
@@ -143,13 +142,13 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     StaticText5 = new wxStaticText(control_panel, ID_STATICTEXT5, _("DWA PLANNER"), wxPoint(168,216), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     StaticText11 = new wxStaticText(control_panel, ID_STATICTEXT11, _("Prediction steps number, N param"), wxPoint(8,352), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
     StaticText12 = new wxStaticText(control_panel, ID_STATICTEXT12, _("GOAL"), wxPoint(192,144), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+    StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Don\'t forget to press\nEnter button after input\nany new values."), wxPoint(752,488), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
     world_timer.SetOwner(this, ID_WORLD_TIMER);
     world_timer.Start(25, false);
     controller_timer.SetOwner(this, ID_CONTROLLER_TIMER);
     controller_timer.Start(500, false);
     Center();
 
-    map_panel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&dwa_demoFrame::Onfield_panelPaint,0,this);
     Connect(ID_START_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnStartButtonClick);
     Connect(ID_NEW_MAP_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnNewMapButtonClick);
     Connect(ID_ROBOTX_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onTextEnter);
@@ -173,6 +172,7 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_WORLD_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::mainTimerTickEvt);
     Connect(ID_CONTROLLER_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::controllerTimerTickEvent);
     Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&dwa_demoFrame::OnClose);
+    Connect(wxEVT_PAINT,(wxObjectEventFunction)&dwa_demoFrame::OnRepaint);
     //*)
 
     world_map = nullptr;
@@ -222,6 +222,7 @@ void dwa_demoFrame::drawRobot()
 {
     wxClientDC field_dc_client(map_panel);
     wxPen orig_pen = field_dc_client.GetPen();
+    wxBrush orig_brush = field_dc_client.GetBrush();
     static std::vector<wxPoint> last_footprint;
 
     if(last_footprint.size() == robot.global_footprint.size())
@@ -231,6 +232,9 @@ void dwa_demoFrame::drawRobot()
     }
     field_dc_client.SetPen(orig_pen);
     field_dc_client.DrawPolygon(robot.global_footprint.size(), robot.global_footprint.data());
+    field_dc_client.SetBrush(wxBrush(wxColour(255, 255, 0))); // yellow color
+    field_dc_client.DrawPolygon(robot.heading_arrow.size(), robot.heading_arrow.data());
+    field_dc_client.SetBrush(orig_brush);
     last_footprint = robot.global_footprint;
 }
 
@@ -369,9 +373,8 @@ void dwa_demoFrame::OnClose(wxCloseEvent& event)
 }
 
 
-void dwa_demoFrame::Onfield_panelPaint(wxPaintEvent& event)
+void dwa_demoFrame::OnRepaint(wxPaintEvent& event)
 {
-    wxPaintDC dc(map_panel);
     redraw_required = true;
 }
 
@@ -384,7 +387,6 @@ void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
     world_map->create(map_panel->GetSize());
     dwa_planner.world_map = world_map;
 
-    clearMap();
     readTextFields();
 
 }

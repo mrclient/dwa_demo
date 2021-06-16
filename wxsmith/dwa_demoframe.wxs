@@ -8,12 +8,12 @@
 		<id_arg>0</id_arg>
 		<style>wxCAPTION|wxCLOSE_BOX|wxMINIMIZE_BOX</style>
 		<handler function="OnClose" entry="EVT_CLOSE" />
+		<handler function="OnRepaint" entry="EVT_PAINT" />
 		<object class="wxPanel" name="ID_MAP_PANEL" variable="map_panel" member="yes">
 			<pos>10,10</pos>
 			<size>510,680</size>
 			<bg>#FFFFFF</bg>
 			<style>wxBORDER_SIMPLE|wxTAB_TRAVERSAL</style>
-			<handler function="Onfield_panelPaint" entry="EVT_PAINT" />
 			<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
 				<label>(5.1 m; 6.8 m)</label>
 				<pos>410,648</pos>
@@ -75,7 +75,6 @@
 				<value>4.0</value>
 				<pos>8,184</pos>
 				<size>60,20</size>
-				<tooltip>Press Enter after input</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
 				<handler function="onTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
@@ -91,7 +90,6 @@
 				<value>4.0</value>
 				<pos>80,184</pos>
 				<size>60,20</size>
-				<tooltip>Press Enter after input</tooltip>
 				<style>wxTE_PROCESS_ENTER</style>
 				<handler function="onTextEnter" entry="EVT_TEXT_ENTER" />
 			</object>
@@ -155,7 +153,7 @@
 				<enabled>0</enabled>
 			</object>
 			<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
-				<label>Motor max. speed (1/s), max. accel (1/s^2), PID time (s):</label>
+				<label>Wheel max. speed (1/s), max. accel (1/s²), PID time (s):</label>
 				<pos>8,80</pos>
 			</object>
 			<object class="wxTextCtrl" name="ID_MAXSPEED_TEXTCTRL" variable="m_max_sp_txt_ctrl" member="yes">
@@ -231,6 +229,10 @@
 				<label>GOAL</label>
 				<pos>192,144</pos>
 			</object>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
+			<label>Don&apos;t forget to press&#x0A;Enter button after input&#x0A;any new values.</label>
+			<pos>752,488</pos>
 		</object>
 		<object class="wxTimer" name="ID_WORLD_TIMER" variable="world_timer" member="yes">
 			<interval>25</interval>
