@@ -9,8 +9,9 @@
 			<Target title="Debug">
 				<Option output="bin/Debug/dwa_demo" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
-				<Option type="0" />
+				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-std=c++11" />
@@ -29,7 +30,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/dwa_demo" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/Windows/dwa_demo" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -85,9 +86,9 @@
 		<Unit filename="wxsmith/dwa_demoframe.wxs" />
 		<Extensions>
 			<wxsmith version="1">
-				<gui name="wxWidgets" src="dwa_demoApp.cpp" main="dwa_demoFrame" init_handlers="necessary" language="CPP" />
+				<gui name="wxWidgets" src="src/dwa_demoApp.cpp" main="dwa_demoFrame" init_handlers="necessary" language="CPP" />
 				<resources>
-					<wxFrame wxs="wxsmith/dwa_demoframe.wxs" src="dwa_demoMain.cpp" hdr="dwa_demoMain.h" fwddecl="0" i18n="1" name="dwa_demoFrame" language="CPP" />
+					<wxFrame wxs="wxsmith/dwa_demoframe.wxs" src="src/dwa_demoMain.cpp" hdr="include/dwa_demoMain.h" fwddecl="0" i18n="1" name="dwa_demoFrame" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>
