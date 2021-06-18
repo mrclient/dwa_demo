@@ -37,7 +37,6 @@ public:
     PID_sim wh1_controller;
     PID_sim wh2_controller;
     std::vector<wxPoint> local_footprint;
-    std::vector<wxPoint> heading_arrow;
     std::vector<wxPoint> global_footprint;
 
     Robot();

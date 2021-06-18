@@ -153,7 +153,7 @@
 				<enabled>0</enabled>
 			</object>
 			<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
-				<label>Wheel max. speed (1/s), max. accel (1/s²), PID time (s):</label>
+				<label>Wheel max. speed (1/s), max. accel (1/s2), PID time (s):</label>
 				<pos>8,80</pos>
 			</object>
 			<object class="wxTextCtrl" name="ID_MAXSPEED_TEXTCTRL" variable="m_max_sp_txt_ctrl" member="yes">
