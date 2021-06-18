@@ -174,6 +174,7 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BORD_TEXTCTRL,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&dwa_demoFrame::onTextEnter);
     Connect(ID_WORLD_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::mainTimerTickEvt);
     Connect(ID_CONTROLLER_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::controllerTimerTickEvent);
+    Connect(ID_REDRAW_TIMER,wxEVT_TIMER,(wxObjectEventFunction)&dwa_demoFrame::redrawTimerTickEvt);
     Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&dwa_demoFrame::OnClose);
     Connect(wxEVT_PAINT,(wxObjectEventFunction)&dwa_demoFrame::OnRepaint);
     //*)

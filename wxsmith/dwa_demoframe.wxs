@@ -242,5 +242,10 @@
 			<interval>500</interval>
 			<handler function="controllerTimerTickEvent" entry="EVT_TIMER" />
 		</object>
+		<object class="wxTimer" name="ID_REDRAW_TIMER" variable="redraw_timer" member="yes">
+			<interval>500</interval>
+			<oneshot>1</oneshot>
+			<handler function="redrawTimerTickEvt" entry="EVT_TIMER" />
+		</object>
 	</object>
 </wxsmith>
