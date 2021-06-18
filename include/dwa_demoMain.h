@@ -38,6 +38,7 @@ class dwa_demoFrame: public wxFrame
         DWAplanner dwa_planner;
         bool program_stopped;
         bool redraw_required;
+        bool redraw_allowed;
 
         void clearMap();
         void drawMap();
@@ -58,6 +59,7 @@ class dwa_demoFrame: public wxFrame
         void OnStartButtonClick(wxCommandEvent& event);
         void controllerTimerTickEvent(wxTimerEvent& event);
         void onTextEnter(wxCommandEvent& event);
+        void redrawTimerTickEvt(wxTimerEvent& event);
         //*)
 
         //(*Identifiers(dwa_demoFrame)
@@ -102,6 +104,7 @@ class dwa_demoFrame: public wxFrame
         static const long ID_STATICTEXT15;
         static const long ID_WORLD_TIMER;
         static const long ID_CONTROLLER_TIMER;
+        static const long ID_REDRAW_TIMER;
         //*)
 
         //(*Declarations(dwa_demoFrame)
@@ -145,6 +148,7 @@ class dwa_demoFrame: public wxFrame
         wxTextCtrl* robot_y_txt_ctrl;
         wxTextCtrl* traj_qnt_txt_ctrl;
         wxTimer controller_timer;
+        wxTimer redraw_timer;
         wxTimer world_timer;
         //*)
 

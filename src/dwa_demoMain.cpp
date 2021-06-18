@@ -84,6 +84,7 @@ const long dwa_demoFrame::ID_CONTROL_PANEL = wxNewId();
 const long dwa_demoFrame::ID_STATICTEXT15 = wxNewId();
 const long dwa_demoFrame::ID_WORLD_TIMER = wxNewId();
 const long dwa_demoFrame::ID_CONTROLLER_TIMER = wxNewId();
+const long dwa_demoFrame::ID_REDRAW_TIMER = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(dwa_demoFrame,wxFrame)
@@ -147,6 +148,8 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     world_timer.Start(25, false);
     controller_timer.SetOwner(this, ID_CONTROLLER_TIMER);
     controller_timer.Start(500, false);
+    redraw_timer.SetOwner(this, ID_REDRAW_TIMER);
+    redraw_timer.Start(500, true);
     Center();
 
     Connect(ID_START_BUTTON,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&dwa_demoFrame::OnStartButtonClick);
@@ -178,6 +181,7 @@ dwa_demoFrame::dwa_demoFrame(wxWindow* parent,wxWindowID id)
     world_map = nullptr;
     program_stopped = true;
     redraw_required = true;
+    redraw_allowed = true;
     dwa_planner.robot = &robot;
     dwa_planner.goal = &goal;
 
@@ -396,10 +400,11 @@ void dwa_demoFrame::OnNewMapButtonClick(wxCommandEvent& event)
 
 void dwa_demoFrame::mainTimerTickEvt(wxTimerEvent& event)
 {
-    if(redraw_required){
+    if(redraw_required && redraw_allowed){
         readTextFields();
         this->Update();
-        redraw_required = false;
+        redraw_required = redraw_allowed = false;
+        redraw_timer.StartOnce(-1); // "-1" means the previous value of time
     }
     if(!program_stopped)
     {
@@ -440,4 +445,9 @@ void dwa_demoFrame::controllerTimerTickEvent(wxTimerEvent& event)
 void dwa_demoFrame::onTextEnter(wxCommandEvent& event)
 {
     readTextFields();
+}
+
+void dwa_demoFrame::redrawTimerTickEvt(wxTimerEvent& event)
+{
+    redraw_allowed = true;
 }
